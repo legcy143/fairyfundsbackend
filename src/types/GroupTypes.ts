@@ -36,6 +36,7 @@ export interface GroupTypes extends Document {
     groupTitle: string;
     createdBy: ObjectId;
     funds: Number;
+    request: any[]
     items: ItemsType[];
     users: UserType[];
     updatedAt: Date;

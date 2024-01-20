@@ -1,6 +1,7 @@
 enum GenderEnum {
-    Male = "Male",
-    Female = "Female",
+    Male = "male",
+    Female = "female",
+    TransGender = "transgender",
     Other = "other"
 }
 

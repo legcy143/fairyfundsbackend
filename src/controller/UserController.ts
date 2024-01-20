@@ -37,7 +37,7 @@ export const UserLogin = async (req: Request, res: Response) => {
         let user;
         user = await User.findOne({ userName, password })
         if (user) {
-            let jwt = GenrateJwtToken({ _id: user._id } , '24h')
+            let jwt = GenrateJwtToken({ _id: user._id }, '24h')
             return res.status(200).send({
                 success: true,
                 user,
@@ -63,6 +63,46 @@ export const FetchProfile = async (req: Request, res: Response) => {
         user = await User.findOne({ _id: req.body.userID })
         if (user) {
             // let jwt = GenrateJwtToken({ _id: user._id })
+            return res.status(200).send({
+                success: true,
+                user,
+            })
+        }
+        return res.status(404).send({
+            success: false,
+            message: "User Not Found"
+        })
+    } catch (error) {
+        return res.status(500).send({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+}
+
+
+type UpdateUserData = {
+    name: string;
+    userName: string;
+    bio: string;
+    myLocation: string;
+    phoneNumber: string;
+    email: string;
+    isPrivate: boolean,
+    gender: "male" | "female" | "other";
+};
+
+export const EditProfile = async (req: Request, res: Response) => {
+    const { name, userName, bio, myLocation, phoneNumber, email, gender }: UpdateUserData = req.body;
+    try {
+        let user;
+        // user = await User.findOne({ _id: req.body.userID })
+        user = await User.findByIdAndUpdate(
+            { _id: req.body.userID },
+            { name, userName, bio, myLocation, phoneNumber, email, gender, updatedAt: new Date() },
+            { new: true }
+        )
+        if (user) {
             return res.status(200).send({
                 success: true,
                 user,

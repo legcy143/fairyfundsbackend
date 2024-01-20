@@ -4,6 +4,7 @@ import { AddItemsInGroup, AddMember, CreateNewGroup, FetchMyGroup } from '../con
 
 const GroupRoute = Router();
 
+// all gruop route starts with .....urls/v{}/group/
 // create group
 GroupRoute.post("/create", verifyToken, CreateNewGroup)
 

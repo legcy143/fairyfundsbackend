@@ -3,7 +3,7 @@ import Group from "../Schema/Group";
 import UserRoleEnum from "../enums/UserRoleEnum";
 import User from "../Schema/User";
 
-export const CreateNewGroup = async (req: Request, res: Response) => {
+export const CreateNewGroup:any = async (req: Request, res: Response) => {
     try {
         const { groupName, groupBio, groupLogo, userID } = req.body;
         let group = await Group.create({

@@ -41,6 +41,15 @@ const GroupSchema: Schema = new Schema({
             }
         }
     ],
+    request: [
+        {
+            memberID: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+                required: true,
+            },
+        }
+    ],
     items: [
         {
             addedBy: {
