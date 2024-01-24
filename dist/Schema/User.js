@@ -29,10 +29,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const GenderEnum_1 = __importDefault(require("../enums/GenderEnum"));
 const UserSchema = new mongoose_1.Schema({
+    name: {
+        type: String,
+        default: "user"
+    },
     userName: {
         type: String,
         required: true,
         unique: true,
+    },
+    bio: {
+        type: String,
+        default: ""
+    },
+    phoneNumber: {
+        type: String,
+        default: ""
+    },
+    email: {
+        type: String,
+        default: ""
+    },
+    myLocation: {
+        type: String,
+        default: ""
     },
     password: {
         select: false,
@@ -47,11 +67,28 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         default: GenderEnum_1.default.Other,
     },
+    isPrivate: {
+        type: Boolean,
+        default: true,
+    },
+    isVerifyed: {
+        type: Boolean,
+        default: false,
+    },
     creditScore: {
         type: Number,
         default: 100,
     },
     lastVisit: {
+        select: false,
+        type: Date,
+        default: new Date(),
+    },
+    updatedAt: {
+        type: Date,
+        default: new Date(),
+    },
+    createdAt: {
         select: false,
         type: Date,
         default: new Date(),

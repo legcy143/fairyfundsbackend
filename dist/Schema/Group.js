@@ -67,6 +67,15 @@ const GroupSchema = new mongoose_1.Schema({
             }
         }
     ],
+    request: [
+        {
+            memberID: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'User',
+                required: true,
+            },
+        }
+    ],
     items: [
         {
             addedBy: {

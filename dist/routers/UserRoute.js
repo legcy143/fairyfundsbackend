@@ -11,6 +11,7 @@ const UserRoute = (0, express_1.default)();
 UserRoute.post("/login", UserController_1.UserLogin);
 UserRoute.post("/signup", UserController_1.UserSignup);
 UserRoute.post("/fetchuser", VerifyToken_1.verifyToken, UserController_1.FetchProfile);
+UserRoute.post("/editprofile", VerifyToken_1.verifyToken, UserController_1.EditProfile);
 // update profile route
 // User.put("/update" , verifyToken ,UpdateProfile)
 // fetch user profile route

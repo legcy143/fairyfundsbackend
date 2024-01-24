@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const VerifyToken_1 = require("../middlewares/VerifyToken");
 const GroupController_1 = require("../controller/GroupController");
 const GroupRoute = (0, express_1.default)();
+// all gruop route starts with .....urls/v{}/group/
 // create group
 GroupRoute.post("/create", VerifyToken_1.verifyToken, GroupController_1.CreateNewGroup);
 // add member to group
