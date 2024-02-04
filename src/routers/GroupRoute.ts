@@ -1,6 +1,6 @@
 import Router from 'express';
 import { verifyToken } from '../middlewares/VerifyToken';
-import { AddItemsInGroup, AddMember, CreateNewGroup, FetchMyGroup } from '../controller/GroupController';
+import { AddItemsInGroup, AddMember, CreateNewGroup, FetchGroupByID, FetchMyGroup } from '../controller/GroupController';
 
 const GroupRoute = Router();
 
@@ -14,6 +14,7 @@ GroupRoute.post("/addmember", verifyToken, AddMember)
 
 // fetch user group
 GroupRoute.get("/fetchmygroup", verifyToken, FetchMyGroup)
+GroupRoute.get("/fetchgroup/:groupID", verifyToken, FetchGroupByID)
 
 // edit group 
 

@@ -14,6 +14,7 @@ GroupRoute.post("/create", VerifyToken_1.verifyToken, GroupController_1.CreateNe
 GroupRoute.post("/addmember", VerifyToken_1.verifyToken, GroupController_1.AddMember);
 // fetch user group
 GroupRoute.get("/fetchmygroup", VerifyToken_1.verifyToken, GroupController_1.FetchMyGroup);
+GroupRoute.get("/fetchgroup/:groupID", VerifyToken_1.verifyToken, GroupController_1.FetchGroupByID);
 // edit group 
 // add product route
 GroupRoute.post("/additem", VerifyToken_1.verifyToken, GroupController_1.AddItemsInGroup);

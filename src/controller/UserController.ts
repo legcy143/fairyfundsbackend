@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import User from "../Schema/User";
 import { GenrateJwtToken } from "../misc/jwt";
+import asyncHandler from "../utils/handler/asyncHandler";
+import { errorResponse } from "../utils/response/Response";
 
 
-export const UserSignup = async (req: Request, res: Response) => {
-    try {
+export const UserSignup = asyncHandler(async (req: Request, res: Response) => {
         const { userName, password } = req.body
         let user;
         user = await User.findOne({ userName })
@@ -23,17 +24,10 @@ export const UserSignup = async (req: Request, res: Response) => {
             user,
             jwt,
         })
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Internal Server Error"
-        })
-    }
-}
+})
 
-export const UserLogin = async (req: Request, res: Response) => {
-    try {
-        const { userName, password } = req.body
+export const UserLogin = asyncHandler(async (req: Request, res: Response) => {
+        const { userName, password } = req.body;
         let user;
         user = await User.findOne({ userName, password })
         if (user) {
@@ -48,17 +42,10 @@ export const UserLogin = async (req: Request, res: Response) => {
             success: false,
             message: "User Not Found"
         })
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Internal Server Error"
-        })
-    }
-};
+});
 
 
-export const FetchProfile = async (req: Request, res: Response) => {
-    try {
+export const FetchProfile = asyncHandler(async (req: Request, res: Response) => {
         let user;
         user = await User.findOne({ _id: req.body.userID })
         if (user) {
@@ -72,13 +59,7 @@ export const FetchProfile = async (req: Request, res: Response) => {
             success: false,
             message: "User Not Found"
         })
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Internal Server Error"
-        })
-    }
-}
+})
 
 
 type UpdateUserData = {
@@ -92,14 +73,13 @@ type UpdateUserData = {
     gender: "male" | "female" | "other";
 };
 
-export const EditProfile = async (req: Request, res: Response) => {
-    const { name, userName, bio, myLocation, phoneNumber, email, gender }: UpdateUserData = req.body;
-    try {
+export const EditProfile = asyncHandler(async (req: Request, res: Response) => {
+    const { name, userName, bio, myLocation, phoneNumber, email, gender ,isPrivate }: UpdateUserData = req.body;
         let user;
         // user = await User.findOne({ _id: req.body.userID })
         user = await User.findByIdAndUpdate(
             { _id: req.body.userID },
-            { name, userName, bio, myLocation, phoneNumber, email, gender, updatedAt: new Date() },
+            { name, userName, bio, myLocation, phoneNumber, email, gender,isPrivate, updatedAt: new Date() },
             { new: true }
         )
         if (user) {
@@ -108,14 +88,9 @@ export const EditProfile = async (req: Request, res: Response) => {
                 user,
             })
         }
-        return res.status(404).send({
-            success: false,
-            message: "User Not Found"
-        })
-    } catch (error) {
-        return res.status(500).send({
-            success: false,
-            message: "Internal Server Error"
-        })
-    }
-}
+        return errorResponse(res , 404 , "User Not Found")
+})
+
+// export const SendFeedBack = asyncHandler(async (req: Request, res: Response) => {
+    
+// })
