@@ -136,6 +136,30 @@ const GroupSchema = new mongoose_1.Schema({
             }
         }
     ],
+    inviteKeys: [
+        {
+            key: {
+                unique: true,
+                type: String,
+            },
+            IV: {
+                type: String,
+                // select:false,
+            },
+            genrateBy: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            },
+        }
+    ],
+    createdAt: {
+        type: Date,
+        default: new Date(),
+        select: false,
+    },
     updatedAt: {
         select: false,
         type: Date,

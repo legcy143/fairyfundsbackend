@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export function encryption(text: string, key: any) {
+export function encryption(text: any, key: any) {
     try {
         const iv = crypto.randomBytes(16);
         const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);
@@ -12,7 +12,7 @@ export function encryption(text: string, key: any) {
     }
 }
 
-export function decryption(encryptedText: string, key: any, iv: string) {
+export function decryption(encryptedText: any, iv: string , key: any) {
     try{
         const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(iv, 'hex'));
         let decrypted = decipher.update(encryptedText, 'hex', 'utf-8');

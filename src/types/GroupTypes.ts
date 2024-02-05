@@ -39,5 +39,7 @@ export interface GroupTypes extends Document {
     request: any[]
     items: ItemsType[];
     users: UserType[];
+    inviteKeys:{key:string , IV:string , genrateBy:string , createdAt:Date}[]
+    createdAt:Date,
     updatedAt: Date;
 }

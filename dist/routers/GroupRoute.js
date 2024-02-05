@@ -10,41 +10,14 @@ const GroupRoute = (0, express_1.default)();
 // all gruop route starts with .....urls/v{}/group/
 // create group
 GroupRoute.post("/create", VerifyToken_1.verifyToken, GroupController_1.CreateNewGroup);
-// add member to group
-GroupRoute.post("/addmember", VerifyToken_1.verifyToken, GroupController_1.AddMember);
+// add member actions
+GroupRoute.post("/groupinviteresponse", VerifyToken_1.verifyToken, GroupController_1.GroupInviteResponse);
+GroupRoute.post("/genrateinvitelink", VerifyToken_1.verifyToken, GroupController_1.InviteLinkGenerator);
+GroupRoute.post("/removeinvitelink", VerifyToken_1.verifyToken, GroupController_1.DeleteInviteLink);
+GroupRoute.post("/sendrequest", VerifyToken_1.verifyToken, GroupController_1.SendRequest);
 // fetch user group
 GroupRoute.get("/fetchmygroup", VerifyToken_1.verifyToken, GroupController_1.FetchMyGroup);
 GroupRoute.get("/fetchgroup/:groupID", VerifyToken_1.verifyToken, GroupController_1.FetchGroupByID);
-// edit group 
 // add product route
 GroupRoute.post("/additem", VerifyToken_1.verifyToken, GroupController_1.AddItemsInGroup);
-/**
-{
-  "groupID": "65847059267a3beee6422b21",
-  "broughtBy": "6584163e303dbed93ef48a75",
-  "message": "ok test message done",
-  "title": "sheetal grocery",
-  "includedMembers": [
-    {
-      "userID": "6584163e303dbed93ef48a75",
-      "deductAmount": 12
-    }
-  ],
-  "product": [
-    {
-      "name": "abc sabzi",
-      "price": 120,
-      "quantity": "1kg"
-    },
-    {
-      "name": "abc sabzi 3",
-      "price": 120,
-      "quantity": "2kg"
-    }
-  ],
-  "totalPrice": 120
-}
-
- */
-// fetch group data route
 exports.default = GroupRoute;

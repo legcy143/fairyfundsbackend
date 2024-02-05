@@ -18,7 +18,7 @@ function encryption(text, key) {
     }
 }
 exports.encryption = encryption;
-function decryption(encryptedText, key, iv) {
+function decryption(encryptedText, iv, key) {
     try {
         const decipher = crypto_1.default.createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(iv, 'hex'));
         let decrypted = decipher.update(encryptedText, 'hex', 'utf-8');

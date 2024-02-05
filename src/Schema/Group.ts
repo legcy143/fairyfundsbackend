@@ -110,6 +110,31 @@ const GroupSchema: Schema = new Schema({
             }
         }
     ],
+    inviteKeys:[
+        {
+            key:{
+                unique:true,
+                type:String,
+            },
+            IV:{
+                type:String,
+                // select:false,
+            },
+            genrateBy:{
+                type:String,
+            },
+            createdAt:{
+                type: Date,
+                default: new Date(),
+            },
+
+        }
+    ],
+    createdAt:{
+        type: Date,
+        default: new Date(),
+        select: false,
+    },
     updatedAt: {
         select: false,
         type: Date,

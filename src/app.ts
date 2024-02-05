@@ -10,6 +10,7 @@ import asyncHandler from "./utils/handler/asyncHandler";
 import { errorResponse, successResponse } from "./utils/response/Response";
 import Group from "./Schema/Group";
 import UserRoleEnum from "./enums/UserRoleEnum";
+import { SecretKeyConverter, decryption, encryption } from "./utils/security/Hasing";
 
 const app: Express = express()
 
@@ -38,24 +39,18 @@ let healthHandler = asyncHandler(async (req: Request, res: Response, next: NextF
 // Route with a function containing try-catch block
 app.get("/health", healthHandler);
 app.get("/test" , asyncHandler(async(req:Request,res:Response)=>{
-    const {groupID , userID} = req.body
-    let group;
-    group = await Group.findOneAndUpdate(
-        { 
-            _id: groupID ,
-            "users.role": UserRoleEnum.Admin,
-            "users.memberID": userID ,
-        },
-        {
-            
-            funds:45,
-        },
-        { new: true }
-    ).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    })
-    return successResponse(res , 200 , undefined , group)
+   let a = {a:'hii' , b:'hello'};
+   let data  = JSON.stringify(a);
+   let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string)
+   const sk = encryption(data , secretkey);
+//    if -1 return error else it create blunder
+   console.log(sk);
+   let dec;
+   if(sk != -1){
+       let d1:any = decryption(sk.encrypted , sk.iv , secretkey)
+       dec = JSON.parse(d1);
+   }
+    return successResponse(res , 200 , undefined , {sk , dec},)
 }))
 
 app.use("/api/v1/user", UserRoute)

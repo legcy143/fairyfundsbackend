@@ -13,8 +13,7 @@ const UserRoute_1 = __importDefault(require("./routers/UserRoute"));
 const GroupRoute_1 = __importDefault(require("./routers/GroupRoute"));
 const asyncHandler_1 = __importDefault(require("./utils/handler/asyncHandler"));
 const Response_1 = require("./utils/response/Response");
-const Group_1 = __importDefault(require("./Schema/Group"));
-const UserRoleEnum_1 = __importDefault(require("./enums/UserRoleEnum"));
+const Hasing_1 = require("./utils/security/Hasing");
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
@@ -37,19 +36,18 @@ let healthHandler = (0, asyncHandler_1.default)(async (req, res, next) => {
 // Route with a function containing try-catch block
 app.get("/health", healthHandler);
 app.get("/test", (0, asyncHandler_1.default)(async (req, res) => {
-    const { groupID, userID } = req.body;
-    let group;
-    group = await Group_1.default.findOneAndUpdate({
-        _id: groupID,
-        "users.role": UserRoleEnum_1.default.Admin,
-        "users.memberID": userID,
-    }, {
-        funds: 45,
-    }, { new: true }).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    });
-    return (0, Response_1.successResponse)(res, 200, undefined, group);
+    let a = { a: 'hii', b: 'hello' };
+    let data = JSON.stringify(a);
+    let secretkey = (0, Hasing_1.SecretKeyConverter)(process.env.INVITE_KEY_SECRET);
+    const sk = (0, Hasing_1.encryption)(data, secretkey);
+    //    if -1 return error else it create blunder
+    console.log(sk);
+    let dec;
+    if (sk != -1) {
+        let d1 = (0, Hasing_1.decryption)(sk.encrypted, sk.iv, secretkey);
+        dec = JSON.parse(d1);
+    }
+    return (0, Response_1.successResponse)(res, 200, undefined, { sk, dec });
 }));
 app.use("/api/v1/user", UserRoute_1.default);
 app.use("/api/v1/group", GroupRoute_1.default);

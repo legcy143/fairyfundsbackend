@@ -4,6 +4,18 @@ import UserRoleEnum from "../enums/UserRoleEnum";
 import User from "../Schema/User";
 import asyncHandler from "../utils/handler/asyncHandler";
 import { errorResponse, successResponse } from "../utils/response/Response";
+import { SecretKeyConverter, decryption, encryption } from "../utils/security/Hasing";
+
+let GroupPopulateObj = [
+    {
+        path: 'users.memberID',
+        select: 'userName',
+    },
+    {
+        path: 'request.memberID',
+        select: ['userName', 'bio']
+    }
+]
 
 export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Response) => {
     const { groupName, groupBio, groupLogo, userID } = req.body;
@@ -28,10 +40,7 @@ export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Respon
 
 export const FetchMyGroup = asyncHandler(async (req: Request, res: Response) => {
     const { userID } = req.body;
-    let groups = await Group.find({ "users.memberID": userID }).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    });
+    let groups = await Group.find({ "users.memberID": userID }).populate(GroupPopulateObj);
     groups.reverse();
     return res.status(200).send({
         success: true,
@@ -46,10 +55,7 @@ export const FetchGroupByID = asyncHandler(async (req: Request, res: Response) =
     let group = await Group.findOne({
         "users.memberID": userID,
         "_id": groupID
-    }).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    });
+    }).populate(GroupPopulateObj)
     // console.log(groupID,group)
     if (!group)
         return errorResponse(res, 404, 'Group Not Found')
@@ -112,10 +118,7 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
             }
         },
         { new: true }
-    ).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    });
+    ).populate(GroupPopulateObj)
     return res.status(200).send({
         success: true,
         message: "Added Item Successfuly",
@@ -127,23 +130,18 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
 
 
 // add user in group functionality
-export const InviteLinkGenerator = asyncHandler((req: Request, res: Response) => {
-    const { gropuID, userID } = req.body;
-})
-
-export const SendRequest = asyncHandler(() => {
-
-})
-
-
-export const AddMember = asyncHandler(async (req: Request, res: Response) => {
-    const { groupID, userID, memberID } = req.body
-    let group;
-    let member: any = await User.find({ _id: memberID })
-    if (!member) {
-        throw new Error("something went wrong")
+export const InviteLinkGenerator = asyncHandler(async (req: Request, res: Response) => {
+    const { groupID, userID } = req.body;
+    if (!groupID || !userID) {
+        return errorResponse(res, 404, 'Resource Not Found')
     }
-    group = await Group.findOneAndUpdate(
+    const reqBody = JSON.stringify({ groupID, userID });
+    let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string);
+    const sk = encryption(reqBody, secretkey);
+    if (sk == -1) {
+        return errorResponse(res);
+    }
+    let group = await Group.findOneAndUpdate(
         {
             "users.memberID": userID,
             "users.role": UserRoleEnum.Admin,
@@ -151,18 +149,114 @@ export const AddMember = asyncHandler(async (req: Request, res: Response) => {
         },
         {
             $push: {
-                users: {
-                    memberID
+                inviteKeys: {
+                    key: sk.encrypted,
+                    IV: sk.iv
                 },
             }
         },
         { new: true }
-    ).populate({
-        path: 'users.memberID',
-        select: 'userName',
-    })
+    ).populate(GroupPopulateObj)
     if (!group) {
-        return errorResponse(res, 404, "Group Not Found")
+        return errorResponse(res, 404, 'Group Not Found')
     }
-    return successResponse(res, 200, undefined , group)
+    return successResponse(res, 200, undefined, group)
 })
+// delete invite key user in group functionality
+export const DeleteInviteLink = asyncHandler(async (req: Request, res: Response) => {
+    const { groupID, userID, inviteKeyID } = req.body;
+    if (!groupID || !userID) {
+        return errorResponse(res, 404, 'Resource Not Found')
+    }
+    let group = await Group.findOneAndUpdate(
+        {
+            "users.memberID": userID,
+            "users.role": UserRoleEnum.Admin,
+            "_id": groupID,
+        },
+        {
+            $pull: {
+                inviteKeys: {
+                    _id: inviteKeyID
+                },
+            }
+        },
+        { new: true }
+    ).populate(GroupPopulateObj)
+    if (!group) {
+        return errorResponse(res, 404, 'Group Not Found')
+    }
+    return successResponse(res, 200, undefined, group)
+})
+
+export const SendRequest = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, inviteKey, IV } = req.body;
+    let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string);
+    const decrData = decryption(inviteKey, IV, secretkey);
+    if (decrData == -1) {
+        return errorResponse(res);
+    }
+    let parsedData = JSON.parse(decrData);
+    let group = await Group.findOne({
+        "users.memberID": userID,
+        "_id": parsedData.groupID,
+    })
+    if (group) {
+        return errorResponse(res, 409, 'Already A Group Member')
+    }
+    group = await Group.findOneAndUpdate(
+        {
+            _id: parsedData.groupID,
+            "request.memberID": { $ne: userID }
+        },
+        {
+            $push: {
+                request: { memberID: userID }
+            }
+        },
+        { new: true },
+    );
+
+    if (!group) {
+        return errorResponse(res, 409, 'Request already send')
+    }
+    return successResponse(res, 200, 'Request Send Successfully')
+
+})
+
+
+export const GroupInviteResponse = asyncHandler(async (req: Request, res: Response) => {
+    const { groupID, userID, memberID, isAccept = false } = req.body
+    let member: any = await User.find({ _id: memberID })
+    if (!member) {
+        return errorResponse(res, 404, 'User Not Found')
+    }
+
+    const commonQuery = {
+        "users.memberID": userID,
+        "users.role": UserRoleEnum.Admin,
+        "_id": groupID,
+        "request.memberID": memberID
+    };
+
+    const updatedData = {
+        $pull: {
+            request: { memberID }
+        },
+        ...(isAccept && {
+            $push: {
+                users: { memberID }
+            }
+        })
+    };
+
+    let group;
+    group = await Group.findOneAndUpdate(commonQuery, updatedData, { new: true }).populate(GroupPopulateObj)
+
+    if (!group) {
+        return errorResponse(res, 404, "No Request Found")
+    }
+    let message = isAccept ? "join request successfully"  : "Request Rejected"
+    return successResponse(res, 200, message, group)
+})
+

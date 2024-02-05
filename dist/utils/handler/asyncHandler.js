@@ -7,6 +7,7 @@ function asyncHandler(innerFunc) {
             await innerFunc(req, res, next);
         }
         catch (error) {
+            console.log("from asynchandler ", error);
             return (0, Response_1.errorResponse)(res);
         }
     };
