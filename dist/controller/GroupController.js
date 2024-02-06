@@ -34,6 +34,7 @@ exports.CreateNewGroup = (0, asyncHandler_1.default)(async (req, res) => {
             },
         ],
     });
+    await group.populate(GroupPopulateObj);
     return res.status(200).send({
         success: true,
         message: "Group Created Succesfully",
@@ -120,7 +121,8 @@ exports.InviteLinkGenerator = (0, asyncHandler_1.default)(async (req, res) => {
     if (!groupID || !userID) {
         return (0, Response_1.errorResponse)(res, 404, 'Resource Not Found');
     }
-    const reqBody = JSON.stringify({ groupID, userID });
+    const dateTime = new Date().toLocaleString();
+    const reqBody = JSON.stringify({ groupID, userID, dateTime });
     let secretkey = (0, Hasing_1.SecretKeyConverter)(process.env.INVITE_KEY_SECRET);
     const sk = (0, Hasing_1.encryption)(reqBody, secretkey);
     if (sk == -1) {

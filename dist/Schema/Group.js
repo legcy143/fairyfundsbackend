@@ -139,7 +139,6 @@ const GroupSchema = new mongoose_1.Schema({
     inviteKeys: [
         {
             key: {
-                unique: true,
                 type: String,
             },
             IV: {

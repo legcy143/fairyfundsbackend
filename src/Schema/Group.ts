@@ -113,7 +113,6 @@ const GroupSchema: Schema = new Schema({
     inviteKeys:[
         {
             key:{
-                unique:true,
                 type:String,
             },
             IV:{

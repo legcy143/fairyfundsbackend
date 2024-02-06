@@ -6,7 +6,7 @@ export default function asyncHandler(innerFunc: any) {
         try {
             await innerFunc(req, res, next);
         } catch (error) {
-            console.log("from asynchandler ",error)
+            console.log("!from asynchandler == ",error)
             return errorResponse(res)
         }
     }

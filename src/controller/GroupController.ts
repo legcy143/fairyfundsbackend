@@ -30,7 +30,9 @@ export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Respon
                 memberID: userID,
             },
         ],
-    })
+    });
+    await group.populate(GroupPopulateObj)
+
     return res.status(200).send({
         success: true,
         message: "Group Created Succesfully",
@@ -134,8 +136,9 @@ export const InviteLinkGenerator = asyncHandler(async (req: Request, res: Respon
     const { groupID, userID } = req.body;
     if (!groupID || !userID) {
         return errorResponse(res, 404, 'Resource Not Found')
-    }
-    const reqBody = JSON.stringify({ groupID, userID });
+    } 
+    const dateTime = new Date().toLocaleString();
+    const reqBody = JSON.stringify({ groupID, userID , dateTime});
     let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string);
     const sk = encryption(reqBody, secretkey);
     if (sk == -1) {
