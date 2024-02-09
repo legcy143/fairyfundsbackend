@@ -3,20 +3,21 @@
 
 
 // previous done task
-[X] = delete Group 
-[x] = leave group
-[X] = promote or demote as admin
+[/] = delete Group 
+[/] = leave group
+[/] = promote or demote as admin
+[/] = admin basic dashboard
 
 //currently working on 
+[X] = verify email and phone number
+[X] = task CRUD;
 
 
 // left features
-[X] = task CRUD;
 
 [X] = update product
 [X] = delte product
 [X] = password reset
-[X] = verify email and phone number
 [x] = promote as admin by main admin only
 [X] = add member funds //funds
 [X] = chat
@@ -25,8 +26,16 @@
 //Subscription
 [X] = update user schema
 
-// Admin 
 
-[x] = login as a admin
-[x] = fetch all user data 
-[x] = fetch all group data 
+
+
+// Admin --  pannel
+
+// done
+[/] = login as a admin
+[/] = fetch all user data 
+[/] = fetch all group data 
+
+
+// left
+[x] = dashboard

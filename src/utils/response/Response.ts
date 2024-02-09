@@ -3,26 +3,24 @@ import { Response } from "express"
 
 export const errorResponse = (
     res?: Response,
-    statusCode:number = 500,
-    message:string = "Internal Server Error",
-    data?:any,
-    isSuccess: boolean = false,
+    statusCode: number = 500,
+    message: string = "Internal Server Error",
+    data?: any,
 ) => {
     return res?.status(statusCode).send({
-        success: isSuccess,
+        success: false,
         message,
-        data
+        data,
     })
 }
 export const successResponse = (
     res?: Response,
-    statusCode:number = 200,
-    message:string = "success",
-    data?:any,
-    isSuccess: boolean = true,
+    statusCode: number = 200,
+    message: string = "success",
+    data?: any,
 ) => {
     return res?.status(statusCode).send({
-        success: isSuccess,
+        success: true,
         message,
         data,
     })

@@ -1,27 +1,25 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/handler/asyncHandler";
 import { errorResponse, successResponse } from "../utils/response/Response";
-import { GenrateJwtToken } from "../misc/jwt";
+import User from "../Schema/User";
+import Group from "../Schema/Group";
+import { GroupPopulater } from "../helper/pouplater/GroupPopulater";
 
-let dummy = {email :'legcy143@gmail.com', password:"stealit." , otp:121212};
+let groupAdminPopulater = [...GroupPopulater,
+{    path: 'groupOwner',
+    select: ['userName', 'bio']
+},
+{    path: 'createdBy',
+    select: ['userName', 'bio']
+}
+]
 
-export const AdminGetOtp = asyncHandler(async(req:Request , res:Response)=>{
-    const {email , password } = req.body;
-    if(email == dummy.email && password == dummy.password){
-        return successResponse(res , 200)
-    }
-    else{
-        return errorResponse(res , 404 , "Invalid details")
-    }
+export const FetchAllUser = asyncHandler(async (req: Request, res: Response) => {
+    let users = await User.find({ }).select('+lastVisit +createdAt')
+  
+    return successResponse(res, 200, undefined, users)
 })
-
-export const Admin2FVerify = asyncHandler(async(req:Request , res:Response)=>{
-    const {email , password ,otp } = req.body;
-    if(email == dummy.email && password == dummy.password && otp == dummy.otp){
-        let jwt = GenrateJwtToken(dummy ,'1h');
-        return successResponse(res , 200 , undefined , {jwt})
-    }
-    else{
-        return errorResponse(res , 404 , "Invalid details")
-    }
+export const FetchAllGroup = asyncHandler(async (req: Request, res: Response) => {
+    let group = await Group.find({}).populate(groupAdminPopulater).select('+updatedAt +createdAt')
+    return successResponse(res, 200, undefined, group)
 })

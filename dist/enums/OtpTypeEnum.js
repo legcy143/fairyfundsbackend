@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Otptype;
 (function (Otptype) {
-    Otptype["auth"] = "auth";
+    Otptype["Auth"] = "auth";
+    Otptype["ForgetPassword"] = "forget password";
 })(Otptype || (Otptype = {}));
 exports.default = Otptype;

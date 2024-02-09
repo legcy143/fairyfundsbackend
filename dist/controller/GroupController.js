@@ -10,16 +10,7 @@ const User_1 = __importDefault(require("../Schema/User"));
 const asyncHandler_1 = __importDefault(require("../utils/handler/asyncHandler"));
 const Response_1 = require("../utils/response/Response");
 const Hasing_1 = require("../utils/security/Hasing");
-let GroupPopulateObj = [
-    {
-        path: 'users.memberID',
-        select: 'userName',
-    },
-    {
-        path: 'request.memberID',
-        select: ['userName', 'bio']
-    }
-];
+const GroupPopulater_1 = require("../helper/pouplater/GroupPopulater");
 exports.CreateNewGroup = (0, asyncHandler_1.default)(async (req, res) => {
     const { groupName, groupBio, groupLogo, userID } = req.body;
     let group = await Group_1.default.create({
@@ -35,7 +26,7 @@ exports.CreateNewGroup = (0, asyncHandler_1.default)(async (req, res) => {
             },
         ],
     });
-    await group.populate(GroupPopulateObj);
+    await group.populate(GroupPopulater_1.GroupPopulater);
     return res.status(200).send({
         success: true,
         message: "Group Created Succesfully",
@@ -74,7 +65,7 @@ exports.LeaveGroup = (0, asyncHandler_1.default)(async (req, res) => {
 });
 exports.FetchMyGroup = (0, asyncHandler_1.default)(async (req, res) => {
     const { userID } = req.body;
-    let groups = await Group_1.default.find({ "users.memberID": userID }).populate(GroupPopulateObj);
+    let groups = await Group_1.default.find({ "users.memberID": userID }).populate(GroupPopulater_1.GroupPopulater);
     groups.reverse();
     return res.status(200).send({
         success: true,
@@ -88,7 +79,7 @@ exports.FetchGroupByID = (0, asyncHandler_1.default)(async (req, res) => {
     let group = await Group_1.default.findOne({
         "users.memberID": userID,
         "_id": groupID
-    }).populate(GroupPopulateObj);
+    }).populate(GroupPopulater_1.GroupPopulater);
     if (!group)
         return (0, Response_1.errorResponse)(res, 404, 'Group Not Found');
     else
@@ -145,7 +136,7 @@ exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
                 $position: 0,
             },
         }
-    }, { new: true }).populate(GroupPopulateObj);
+    }, { new: true }).populate(GroupPopulater_1.GroupPopulater);
     return res.status(200).send({
         success: true,
         message: "Added Item Successfuly",
@@ -180,7 +171,7 @@ exports.InviteLinkGenerator = (0, asyncHandler_1.default)(async (req, res) => {
                 IV: sk.iv
             },
         }
-    }, { new: true }).populate(GroupPopulateObj);
+    }, { new: true }).populate(GroupPopulater_1.GroupPopulater);
     if (!group) {
         return (0, Response_1.errorResponse)(res, 404, 'Group Not Found');
     }
@@ -206,7 +197,7 @@ exports.DeleteInviteLink = (0, asyncHandler_1.default)(async (req, res) => {
                 _id: inviteKeyID
             },
         }
-    }, { new: true }).populate(GroupPopulateObj);
+    }, { new: true }).populate(GroupPopulater_1.GroupPopulater);
     if (!group) {
         return (0, Response_1.errorResponse)(res, 404, 'Group Not Found');
     }
@@ -267,7 +258,7 @@ exports.GroupInviteResponse = (0, asyncHandler_1.default)(async (req, res) => {
         })
     };
     let group;
-    group = await Group_1.default.findOneAndUpdate(commonQuery, updatedData, { new: true }).populate(GroupPopulateObj);
+    group = await Group_1.default.findOneAndUpdate(commonQuery, updatedData, { new: true }).populate(GroupPopulater_1.GroupPopulater);
     if (!group) {
         return (0, Response_1.errorResponse)(res, 404, "No Request Found");
     }
@@ -287,7 +278,7 @@ exports.PromoteOrDemoteAsAdmin = (0, asyncHandler_1.default)(async (req, res) =>
         _id: groupID,
         "users.memberID": memberID,
         'groupOwner': userID,
-    }, action, { new: true }).populate(GroupPopulateObj);
+    }, action, { new: true }).populate(GroupPopulater_1.GroupPopulater);
     if (!group) {
         return (0, Response_1.errorResponse)(res, 404, "something went wrong");
     }

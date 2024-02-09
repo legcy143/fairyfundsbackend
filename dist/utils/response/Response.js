@@ -1,17 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.successResponse = exports.errorResponse = void 0;
-const errorResponse = (res, statusCode = 500, message = "Internal Server Error", data, isSuccess = false) => {
+const errorResponse = (res, statusCode = 500, message = "Internal Server Error", data) => {
     return res?.status(statusCode).send({
-        success: isSuccess,
+        success: false,
         message,
-        data
+        data,
     });
 };
 exports.errorResponse = errorResponse;
-const successResponse = (res, statusCode = 200, message = "success", data, isSuccess = true) => {
+const successResponse = (res, statusCode = 200, message = "success", data) => {
     return res?.status(statusCode).send({
-        success: isSuccess,
+        success: true,
         message,
         data,
     });

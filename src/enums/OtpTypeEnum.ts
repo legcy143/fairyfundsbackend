@@ -1,4 +1,5 @@
 enum Otptype{
-    auth = 'auth'
+    Auth = 'auth',
+    ForgetPassword = 'forget password'
 }
 export default Otptype
