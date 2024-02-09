@@ -11,6 +11,7 @@ import { errorResponse, successResponse } from "./utils/response/Response";
 import Group from "./Schema/Group";
 import UserRoleEnum from "./enums/UserRoleEnum";
 import { SecretKeyConverter, decryption, encryption } from "./utils/security/Hasing";
+import AdminRoute from "./routers/AdminRoute";
 
 const app: Express = express()
 
@@ -31,33 +32,21 @@ app.get("/", (req: Request, res: Response) => {
 })
 
 let healthHandler = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    // let arr:any = {a:34};   // run error part
-    // arr.map((e:any)=>{console.log(e)})
-   return successResponse(res , 200 , "OK");
+   return successResponse(res , 200 , "OK" , {version:1});
 });
 
 // Route with a function containing try-catch block
 app.get("/health", healthHandler);
 app.get("/test" , asyncHandler(async(req:Request,res:Response)=>{
-   let a = {a:'hii' , b:'hello'};
-   let data  = JSON.stringify(a);
-   let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string)
-   const sk = encryption(data , secretkey);
-//    if -1 return error else it create blunder
-   console.log(sk);
-   let dec;
-   if(sk != -1){
-       let d1:any = decryption(sk.encrypted , sk.iv , secretkey)
-       dec = JSON.parse(d1);
-   }
-    return successResponse(res , 200 , undefined , {sk , dec},)
+    return successResponse(res , 200 , undefined)
 }))
 
-app.use("/api/v1/user", UserRoute)
-app.use("/api/v1/group", GroupRoute)
+app.use(`/api/v1/user`, UserRoute)
+app.use(`/api/v1/group`, GroupRoute)
+app.use(`/api/v1/admin`, AdminRoute)
 
 app.get("*", asyncHandler(async(req: Request, res: Response) => {
-  return errorResponse(res , 404 , "Not Found")
+  return errorResponse(res , 404 , "Route Not Found , Invalid Route")
 }))
 
 export default app;

@@ -1,0 +1,32 @@
+// for backend side
+
+
+
+// previous done task
+[X] = delete Group 
+[x] = leave group
+[X] = promote or demote as admin
+
+//currently working on 
+
+
+// left features
+[X] = task CRUD;
+
+[X] = update product
+[X] = delte product
+[X] = password reset
+[X] = verify email and phone number
+[x] = promote as admin by main admin only
+[X] = add member funds //funds
+[X] = chat
+
+
+//Subscription
+[X] = update user schema
+
+// Admin 
+
+[x] = login as a admin
+[x] = fetch all user data 
+[x] = fetch all group data 

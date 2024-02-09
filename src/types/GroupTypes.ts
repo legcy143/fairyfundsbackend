@@ -34,6 +34,8 @@ export interface GroupTypes extends Document {
     groupName: string;
     groupLogo: string;
     groupTitle: string;
+    groupBio:string;
+    groupOwner:ObjectId;
     createdBy: ObjectId;
     funds: Number;
     request: any[]

@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { GroupTypes } from "../types/GroupTypes";
 import UserRoleEnum from "../enums/UserRoleEnum";
 
-const GroupSchema: Schema = new Schema({
+const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
     groupName: {
         type: String,
         required: true,
@@ -16,6 +16,11 @@ const GroupSchema: Schema = new Schema({
         default: "fairyfunds"
     },
     createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    groupOwner: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true

@@ -21,6 +21,7 @@ export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Respon
     const { groupName, groupBio, groupLogo, userID } = req.body;
     let group = await Group.create({
         createdBy: userID,
+        groupOwner:userID,
         groupLogo,
         groupName,
         groupBio,
@@ -38,6 +39,47 @@ export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Respon
         message: "Group Created Succesfully",
         group
     })
+})
+export const DeleteGroup: any = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, groupID } = req.body;
+    let group = await Group.findOneAndDelete(
+        {
+            'groupOwner': userID,
+            '_id': groupID,
+        }
+    )
+    if (!group) {
+        return errorResponse(res, 401, 'Group only delete by group owner')
+    }
+    return successResponse(res, 200, 'Group Deleted Successfully')
+
+
+})
+export const LeaveGroup: any = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, groupID } = req.body;
+    if (!groupID || !userID) {
+        return errorResponse(res, 400, 'Data missing went wrong')
+    }
+    let group = await Group.findOneAndUpdate(
+        {
+            'groupOwner': { $ne: userID },
+            'users.memberID': userID,
+            '_id': groupID
+        },
+        {
+            $pull: {
+                users: { memberID: userID }
+            }
+
+        },
+        { new: true }
+    )
+    if (group) {
+        return successResponse(res, 200)
+    }
+    return errorResponse(res, 403, 'Group owner cannot leave group')
+
+
 })
 
 export const FetchMyGroup = asyncHandler(async (req: Request, res: Response) => {
@@ -58,7 +100,6 @@ export const FetchGroupByID = asyncHandler(async (req: Request, res: Response) =
         "users.memberID": userID,
         "_id": groupID
     }).populate(GroupPopulateObj)
-    // console.log(groupID,group)
     if (!group)
         return errorResponse(res, 404, 'Group Not Found')
     else
@@ -106,9 +147,17 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
 
     // this current amount per person
     let totalFund: any = group?.funds;
-    // console.log(group?.funds)
     group = await Group.findOneAndUpdate(
-        { _id: groupID },
+        {
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+
+        },
         {
             funds: totalFund - totalPrice,
             $push: {
@@ -136,9 +185,9 @@ export const InviteLinkGenerator = asyncHandler(async (req: Request, res: Respon
     const { groupID, userID } = req.body;
     if (!groupID || !userID) {
         return errorResponse(res, 404, 'Resource Not Found')
-    } 
+    }
     const dateTime = new Date().toLocaleString();
-    const reqBody = JSON.stringify({ groupID, userID , dateTime});
+    const reqBody = JSON.stringify({ groupID, userID, dateTime });
     let secretkey = SecretKeyConverter(process.env.INVITE_KEY_SECRET as string);
     const sk = encryption(reqBody, secretkey);
     if (sk == -1) {
@@ -146,9 +195,14 @@ export const InviteLinkGenerator = asyncHandler(async (req: Request, res: Respon
     }
     let group = await Group.findOneAndUpdate(
         {
-            "users.memberID": userID,
-            "users.role": UserRoleEnum.Admin,
-            "_id": groupID,
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+
         },
         {
             $push: {
@@ -173,9 +227,14 @@ export const DeleteInviteLink = asyncHandler(async (req: Request, res: Response)
     }
     let group = await Group.findOneAndUpdate(
         {
-            "users.memberID": userID,
-            "users.role": UserRoleEnum.Admin,
-            "_id": groupID,
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+
         },
         {
             $pull: {
@@ -229,18 +288,24 @@ export const SendRequest = asyncHandler(async (req: Request, res: Response) => {
 
 
 export const GroupInviteResponse = asyncHandler(async (req: Request, res: Response) => {
-    const { groupID, userID, memberID, isAccept = false } = req.body
+    const { groupID, userID, memberID, isAccept } = req.body
     let member: any = await User.find({ _id: memberID })
     if (!member) {
         return errorResponse(res, 404, 'User Not Found')
     }
 
     const commonQuery = {
-        "users.memberID": userID,
-        "users.role": UserRoleEnum.Admin,
-        "_id": groupID,
-        "request.memberID": memberID
+        _id: groupID,
+        "request.memberID": memberID,
+        users: {
+            $elemMatch: {
+                memberID: userID,
+                role: UserRoleEnum.Admin,
+            },
+        },
     };
+
+
 
     const updatedData = {
         $pull: {
@@ -259,7 +324,35 @@ export const GroupInviteResponse = asyncHandler(async (req: Request, res: Respon
     if (!group) {
         return errorResponse(res, 404, "No Request Found")
     }
-    let message = isAccept ? "join request successfully"  : "Request Rejected"
+    let message = isAccept ? "join request successfully" : "Request Rejected"
     return successResponse(res, 200, message, group)
 })
 
+
+
+// on user actions
+export const PromoteOrDemoteAsAdmin = asyncHandler(async (req: Request, res: Response) => {
+    const { groupID, userID, memberID, isPromote } = req.body
+
+    const action = {
+        $set: {
+            'users.$.role': isPromote ? UserRoleEnum.Admin : UserRoleEnum.Member
+        }
+
+    }
+
+    let group;
+    group = await Group.findOneAndUpdate({
+        _id: groupID,
+        "users.memberID": memberID,
+        'groupOwner': userID,
+    },
+        action,
+        { new: true }).populate(GroupPopulateObj)
+
+    if (!group) {
+        return errorResponse(res, 404, "something went wrong")
+    }
+    let message = isPromote ? "Promote as a admin Successfully" : "Demote as a admin successfully"
+    return successResponse(res, 200, message, group)
+})

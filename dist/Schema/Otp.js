@@ -22,78 +22,36 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OtpSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const GenderEnum_1 = __importDefault(require("../enums/GenderEnum"));
-const UserSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-        default: "user"
-    },
-    userName: {
-        type: String,
-        required: true,
-        unique: true,
-        set: (value) => value.toLowerCase(),
-    },
-    bio: {
-        type: String,
-        default: ""
-    },
-    phoneNumber: {
-        type: String,
-        default: ""
-    },
+exports.OtpSchema = new mongoose_1.Schema({
     email: {
         type: String,
+        required: true
+    },
+    otp: {
+        type: String
+    },
+    VerificationCode: {
+        type: Number
+    },
+    otpFor: {
+        type: String,
+        default: "authentication"
+    },
+    isValid: {
+        type: Boolean,
+        default: true
+    },
+    location: {
+        type: String,
         default: ""
     },
-    myLocation: {
-        type: String,
-        default: ""
-    },
-    password: {
-        select: false,
-        type: String,
-        required: true,
-    },
-    logo: {
-        type: String,
-        default: "",
-    },
-    gender: {
-        type: String,
-        default: GenderEnum_1.default.Other,
-    },
-    isPrivate: {
-        type: Boolean,
-        default: true,
-    },
-    isVerifyed: {
-        type: Boolean,
-        default: false,
-    },
-    creditScore: {
-        type: Number,
-        default: 100,
-    },
-    lastVisit: {
-        select: false,
-        type: Date,
-        default: new Date(),
-    },
-    updatedAt: {
-        type: Date,
-        default: new Date(),
-    },
-    createdAt: {
-        select: false,
+    firstVisitAt: {
         type: Date,
         default: new Date(),
     }
 });
-const User = mongoose_1.default.model("User", UserSchema);
-exports.default = User;
+const Otp = mongoose_1.default.model("Otp", exports.OtpSchema);
+exports.default = Otp;

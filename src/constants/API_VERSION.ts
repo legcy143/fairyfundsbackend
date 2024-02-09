@@ -1,0 +1,1 @@
+export const API_CURRENT_VERSION = 1

@@ -2,7 +2,7 @@ import mongoose, { Mongoose, Schema } from "mongoose";
 import { UserTypes } from "../types/UserTypes";
 import GenderEnum from "../enums/GenderEnum";
 
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema<UserTypes> = new Schema<UserTypes>({
     name: {
         type: String,
         default: "user"
@@ -11,6 +11,7 @@ const UserSchema: Schema = new Schema({
         type: String,
         required: true,
         unique: true,
+        set: (value:any) => value.toLowerCase(),
     },
     bio: {
         type: String,

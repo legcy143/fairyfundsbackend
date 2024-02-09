@@ -46,6 +46,11 @@ const GroupSchema = new mongoose_1.Schema({
         ref: 'User',
         required: true
     },
+    groupOwner: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     funds: {
         type: Number,
         default: 0,

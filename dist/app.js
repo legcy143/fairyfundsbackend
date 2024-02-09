@@ -13,7 +13,7 @@ const UserRoute_1 = __importDefault(require("./routers/UserRoute"));
 const GroupRoute_1 = __importDefault(require("./routers/GroupRoute"));
 const asyncHandler_1 = __importDefault(require("./utils/handler/asyncHandler"));
 const Response_1 = require("./utils/response/Response");
-const Hasing_1 = require("./utils/security/Hasing");
+const AdminRoute_1 = __importDefault(require("./routers/AdminRoute"));
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
@@ -29,29 +29,17 @@ app.get("/", (req, res) => {
     });
 });
 let healthHandler = (0, asyncHandler_1.default)(async (req, res, next) => {
-    // let arr:any = {a:34};   // run error part
-    // arr.map((e:any)=>{console.log(e)})
-    return (0, Response_1.successResponse)(res, 200, "OK");
+    return (0, Response_1.successResponse)(res, 200, "OK", { version: 1 });
 });
 // Route with a function containing try-catch block
 app.get("/health", healthHandler);
 app.get("/test", (0, asyncHandler_1.default)(async (req, res) => {
-    let a = { a: 'hii', b: 'hello' };
-    let data = JSON.stringify(a);
-    let secretkey = (0, Hasing_1.SecretKeyConverter)(process.env.INVITE_KEY_SECRET);
-    const sk = (0, Hasing_1.encryption)(data, secretkey);
-    //    if -1 return error else it create blunder
-    console.log(sk);
-    let dec;
-    if (sk != -1) {
-        let d1 = (0, Hasing_1.decryption)(sk.encrypted, sk.iv, secretkey);
-        dec = JSON.parse(d1);
-    }
-    return (0, Response_1.successResponse)(res, 200, undefined, { sk, dec });
+    return (0, Response_1.successResponse)(res, 200, undefined);
 }));
-app.use("/api/v1/user", UserRoute_1.default);
-app.use("/api/v1/group", GroupRoute_1.default);
+app.use(`/api/v1/user`, UserRoute_1.default);
+app.use(`/api/v1/group`, GroupRoute_1.default);
+app.use(`/api/v1/admin`, AdminRoute_1.default);
 app.get("*", (0, asyncHandler_1.default)(async (req, res) => {
-    return (0, Response_1.errorResponse)(res, 404, "Not Found");
+    return (0, Response_1.errorResponse)(res, 404, "Route Not Found , Invalid Route");
 }));
 exports.default = app;
