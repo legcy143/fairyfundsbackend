@@ -9,6 +9,7 @@ const connectToMongoDB = async () => {
     try {
         await mongoose_1.default.connect(`${URI}`);
         console.log('Connected to MongoDB');
+        // await Group.collection.dropIndex('inviteKeys.key_1');
     }
     catch (error) {
         console.error(error.message);

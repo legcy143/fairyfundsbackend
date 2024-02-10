@@ -84,11 +84,15 @@ const GroupSchema = new mongoose_1.Schema({
     items: [
         {
             addedBy: {
-                type: String,
+                // type: String,
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'User',
                 required: true,
             },
             broughtBy: {
-                type: String,
+                // type: String,
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'User',
                 required: true,
             },
             message: {
@@ -148,7 +152,6 @@ const GroupSchema = new mongoose_1.Schema({
             },
             IV: {
                 type: String,
-                // select:false,
             },
             genrateBy: {
                 type: String,
@@ -159,17 +162,7 @@ const GroupSchema = new mongoose_1.Schema({
             },
         }
     ],
-    createdAt: {
-        type: Date,
-        default: new Date(),
-        select: false,
-    },
-    updatedAt: {
-        select: false,
-        type: Date,
-        default: new Date()
-    }
-});
+}, { timestamps: true });
 // GroupSchema.pre<any>('findOneAndUpdate', async function (next: any) {
 //     try {
 //         console.log("hii there from group schema pre  function")

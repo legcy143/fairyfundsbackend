@@ -12,7 +12,7 @@ export const CreateNewGroup: any = asyncHandler(async (req: Request, res: Respon
     const { groupName, groupBio, groupLogo, userID } = req.body;
     let group = await Group.create({
         createdBy: userID,
-        groupOwner:userID,
+        groupOwner: userID,
         groupLogo,
         groupName,
         groupBio,
@@ -99,20 +99,9 @@ export const FetchGroupByID = asyncHandler(async (req: Request, res: Response) =
 
 export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) => {
     const { groupID, userID, broughtBy, message, title, includedMembers, item, date } = req.body
-    // addedBy - userID // now name// default from jwt
-    // broughtBy - userid which is must be in group
-    // message - optional
-    // title - required
-    // funds: calculated by pre "save" // function in scheema;
-    // includedMembers: [username];
-    // product: [{name , price , quantity}];
-    // totalPrice: number;
-    // date: when product baught update from user;
-    // createdAt: Date;
     if (!title || !broughtBy || !item) {
         throw new Error("all  fields are required")
     }
-
     // initialize total price
     let totalPrice = 0;
 
@@ -120,24 +109,8 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
     item?.map((e: any) => {
         totalPrice += e?.price
     })
-
-    // get group and user who is try to get user detail who try to add item 
-    let group = await Group.findById({ _id: groupID });
-    let addedByUser: any = await User.findById({ _id: userID })
-
-    // if there is no group or no user then return this
-    if (!group || !addedByUser) {
-        return res.status(404).send({
-            success: false,
-            message: "Group Not Found or invalid user",
-        })
-    }
-
-    // check for user is admin or not 
-    // code...
-
-    // this current amount per person
-    let totalFund: any = group?.funds;
+    let group:any = await Group.findById({ _id: groupID });
+    let val = parseFloat((totalPrice / group?.users.length).toFixed(3));
     group = await Group.findOneAndUpdate(
         {
             _id: groupID,
@@ -150,10 +123,16 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
 
         },
         {
-            funds: totalFund - totalPrice,
+
+            $inc: {
+                funds: -totalPrice,
+                'users.$[].credit': -val
+            },
+            // funds: totalFund - totalPrice,
             $push: {
                 items: {
-                    $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
+                    // $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
+                    $each: [{ addedBy: userID ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                     $position: 0,
 
                 },

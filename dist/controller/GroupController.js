@@ -87,16 +87,6 @@ exports.FetchGroupByID = (0, asyncHandler_1.default)(async (req, res) => {
 });
 exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
     const { groupID, userID, broughtBy, message, title, includedMembers, item, date } = req.body;
-    // addedBy - userID // now name// default from jwt
-    // broughtBy - userid which is must be in group
-    // message - optional
-    // title - required
-    // funds: calculated by pre "save" // function in scheema;
-    // includedMembers: [username];
-    // product: [{name , price , quantity}];
-    // totalPrice: number;
-    // date: when product baught update from user;
-    // createdAt: Date;
     if (!title || !broughtBy || !item) {
         throw new Error("all  fields are required");
     }
@@ -106,20 +96,8 @@ exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
     item?.map((e) => {
         totalPrice += e?.price;
     });
-    // get group and user who is try to get user detail who try to add item 
     let group = await Group_1.default.findById({ _id: groupID });
-    let addedByUser = await User_1.default.findById({ _id: userID });
-    // if there is no group or no user then return this
-    if (!group || !addedByUser) {
-        return res.status(404).send({
-            success: false,
-            message: "Group Not Found or invalid user",
-        });
-    }
-    // check for user is admin or not 
-    // code...
-    // this current amount per person
-    let totalFund = group?.funds;
+    let val = parseFloat((totalPrice / group?.users.length).toFixed(3));
     group = await Group_1.default.findOneAndUpdate({
         _id: groupID,
         users: {
@@ -129,10 +107,15 @@ exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
             }
         },
     }, {
-        funds: totalFund - totalPrice,
+        $inc: {
+            funds: -totalPrice,
+            'users.$[].credit': -val
+        },
+        // funds: totalFund - totalPrice,
         $push: {
             items: {
-                $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
+                // $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
+                $each: [{ addedBy: userID ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                 $position: 0,
             },
         }

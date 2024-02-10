@@ -42,6 +42,6 @@ export interface GroupTypes extends Document {
     items: ItemsType[];
     users: UserType[];
     inviteKeys:{key:string , IV:string , genrateBy:string , createdAt:Date}[]
-    createdAt:Date,
-    updatedAt: Date;
+    // createdAt:Date,
+    // updatedAt: Date;
 }

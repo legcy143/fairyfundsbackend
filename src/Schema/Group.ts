@@ -58,11 +58,15 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
     items: [
         {
             addedBy: {
-                type: String,
+                // type: String,
+                type: Schema.Types.ObjectId,
+                ref: 'User',
                 required: true,
             },
             broughtBy: {
-                type: String,
+                // type: String,
+                type: Schema.Types.ObjectId,
+                ref: 'User',
                 required: true,
             },
             message: {
@@ -122,7 +126,6 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
             },
             IV:{
                 type:String,
-                // select:false,
             },
             genrateBy:{
                 type:String,
@@ -134,17 +137,7 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
 
         }
     ],
-    createdAt:{
-        type: Date,
-        default: new Date(),
-        select: false,
-    },
-    updatedAt: {
-        select: false,
-        type: Date,
-        default: new Date()
-    }
-})
+} , {timestamps:true})
 
 
 // GroupSchema.pre<any>('findOneAndUpdate', async function (next: any) {

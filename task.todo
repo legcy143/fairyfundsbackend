@@ -1,11 +1,8 @@
-// for backend side
-
-
-
 // previous done task
-[/] = delete Group 
+[/] = delete Group ß
 [/] = leave group
 [/] = promote or demote as admin
+[/] = promote as admin by main admin only
 [/] = admin basic dashboard
 
 //currently working on 
@@ -18,13 +15,12 @@
 [X] = update product
 [X] = delte product
 [X] = password reset
-[x] = promote as admin by main admin only
 [X] = add member funds //funds
 [X] = chat
 
 
 //Subscription
-[X] = update user schema
+[X] = update user schema and group schema
 
 
 
