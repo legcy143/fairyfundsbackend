@@ -47,7 +47,7 @@ exports.UserLogin = (0, asyncHandler_1.default)(async (req, res) => {
 });
 exports.FetchProfile = (0, asyncHandler_1.default)(async (req, res) => {
     let user;
-    user = await User_1.default.findOne({ _id: req.body.userID });
+    user = await User_1.default.findOneAndUpdate({ _id: req.body.userID }, { lastVisit: new Date() }, { new: true });
     if (user) {
         // let jwt = GenrateJwtToken({ _id: user._id })
         return res.status(200).send({

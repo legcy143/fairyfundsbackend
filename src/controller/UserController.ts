@@ -47,7 +47,9 @@ export const UserLogin = asyncHandler(async (req: Request, res: Response) => {
 
 export const FetchProfile = asyncHandler(async (req: Request, res: Response) => {
         let user;
-        user = await User.findOne({ _id: req.body.userID })
+        user = await User.findOneAndUpdate({ _id: req.body.userID } , 
+            {lastVisit: new Date() },
+            {new :true})
         if (user) {
             // let jwt = GenrateJwtToken({ _id: user._id })
             return res.status(200).send({
