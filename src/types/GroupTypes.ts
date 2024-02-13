@@ -34,14 +34,16 @@ export interface GroupTypes extends Document {
     groupName: string;
     groupLogo: string;
     groupTitle: string;
-    groupBio:string;
-    groupOwner:ObjectId;
+    groupBio: string;
+    groupOwner: ObjectId;
     createdBy: ObjectId;
     funds: Number;
     request: any[]
     items: ItemsType[];
     users: UserType[];
-    inviteKeys:{key:string , IV:string , genrateBy:string , createdAt:Date}[]
+    task: { title: string, description: string, createdBy: ObjectId, isDone: boolean,mentioned:{user:ObjectId}[], createdAt?: Date }[]
+    history: { title: string, message: string, data?: string, createdAt?: Date }[]
+    inviteKeys: { key: string, IV: string, genrateBy: string, createdAt: Date }[]
     // createdAt:Date,
     // updatedAt: Date;
 }

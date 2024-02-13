@@ -54,21 +54,33 @@ const UserSchema: Schema<UserTypes> = new Schema<UserTypes>({
         type: Number,
         default: 100,
     },
+    notification_token:{
+        type:String,
+        default:"",
+    },
+    notifications:[
+        {
+            message:{
+                type:String,
+            },
+            title:{
+                type:String,
+            },
+            data:{
+                type:String,
+            },
+            createdAt:{
+                type:Date,
+                default : new Date(),
+            }
+        }
+    ],
     lastVisit: {
         select: false,
         type: Date,
         default: new Date(),
     },
-    updatedAt: {
-        type: Date,
-        default: new Date(),
-    },
-    createdAt: {
-        select: false,
-        type: Date,
-        default: new Date(),
-    }
-})
+} ,{timestamps:true})
 
 const User = mongoose.model<UserTypes>("User", UserSchema);
 export default User;

@@ -14,7 +14,14 @@ export interface UserTypes extends Document {
     isPrivate: boolean;
     isVerifyed: boolean;
     creditScore: number;
+    notification_token?: string;
+    notifications: {
+        message: string, 
+        title: string,
+        data:string,
+        createdAt?: Date,
+    }[]
     lastVisit: Date;
-    updatedAt: Date,
-    createdAt: Date,
+    updatedAt?: Date,
+    createdAt?: Date,
 }

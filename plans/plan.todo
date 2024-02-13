@@ -1,1 +1,8 @@
 Subscription 
+
+message schema {
+    message{
+    isseen ;
+    }
+    isnew;
+}

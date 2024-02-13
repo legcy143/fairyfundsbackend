@@ -119,37 +119,73 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
             }
         }
     ],
-    inviteKeys:[
+    task: [
         {
-            key:{
-                type:String,
+            title: {
+                type: String,
             },
-            IV:{
-                type:String,
+            description: {
+                type: String,
             },
-            genrateBy:{
-                type:String,
+            isDone: {
+                type: Boolean,
+                default: false,
             },
-            createdAt:{
+            createdBy: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
+            mentioned: [
+                {
+                    user: {
+                        type: Schema.Types.ObjectId,
+                        ref:'User'
+                    }
+                }
+            ],
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            }
+        }
+    ],
+    history: [
+        {
+            message: {
+                type: String,
+            },
+            title: {
+                type: String,
+            },
+            data: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            }
+        }
+    ],
+    inviteKeys: [
+        {
+            key: {
+                type: String,
+            },
+            IV: {
+                type: String,
+            },
+            genrateBy: {
+                type: String,
+            },
+            createdAt: {
                 type: Date,
                 default: new Date(),
             },
 
         }
     ],
-} , {timestamps:true})
+}, { timestamps: true })
 
 
-// GroupSchema.pre<any>('findOneAndUpdate', async function (next: any) {
-//     try {
-//         console.log("hii there from group schema pre  function")
-//         console.log(this.schema.obj.users)
-//         const totalCredits: any = this.schema.obj.users.reduce((total: any, user: any) => total + user.credit, 0);
-//         this.funds = totalCredits;
-//         next();
-//     } catch (error) {
-//         next(error);
-//     }
-// });
 const Group = mongoose.model<GroupTypes>("Group", GroupSchema);
 export default Group;

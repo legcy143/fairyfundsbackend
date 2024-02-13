@@ -1,6 +1,6 @@
 import Router from 'express';
 import { verifyToken } from '../middlewares/VerifyToken';
-import {  AddItemsInGroup, CreateNewGroup, DeleteGroup, DeleteInviteLink, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, PromoteOrDemoteAsAdmin, SendRequest } from '../controller/GroupController';
+import {  AddItemsInGroup, CreateNewGroup, DeleteGroup, DeleteInviteLink, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, ManageUserCredit, PromoteOrDemoteAsAdmin, SendRequest } from '../controller/GroupController';
 
 const GroupRoute = Router();
 
@@ -21,6 +21,9 @@ GroupRoute.post("/sendrequest" , verifyToken ,SendRequest)
 // fetch user group
 GroupRoute.get("/fetchmygroup", verifyToken, FetchMyGroup)
 GroupRoute.get("/fetchgroup/:groupID", verifyToken, FetchGroupByID)
+
+//user'd end actions
+GroupRoute.post("/manageusercredit" , verifyToken , ManageUserCredit)
 
 
 //product action route

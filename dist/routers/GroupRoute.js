@@ -21,6 +21,8 @@ GroupRoute.post("/sendrequest", VerifyToken_1.verifyToken, GroupController_1.Sen
 // fetch user group
 GroupRoute.get("/fetchmygroup", VerifyToken_1.verifyToken, GroupController_1.FetchMyGroup);
 GroupRoute.get("/fetchgroup/:groupID", VerifyToken_1.verifyToken, GroupController_1.FetchGroupByID);
+//user'd end actions
+GroupRoute.post("/manageusercredit", VerifyToken_1.verifyToken, GroupController_1.ManageUserCredit);
 //product action route
 GroupRoute.post("/additem", VerifyToken_1.verifyToken, GroupController_1.AddItemsInGroup);
 exports.default = GroupRoute;

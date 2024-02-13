@@ -80,20 +80,32 @@ const UserSchema = new mongoose_1.Schema({
         type: Number,
         default: 100,
     },
+    notification_token: {
+        type: String,
+        default: "",
+    },
+    notifications: [
+        {
+            message: {
+                type: String,
+            },
+            title: {
+                type: String,
+            },
+            data: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            }
+        }
+    ],
     lastVisit: {
         select: false,
         type: Date,
         default: new Date(),
     },
-    updatedAt: {
-        type: Date,
-        default: new Date(),
-    },
-    createdAt: {
-        select: false,
-        type: Date,
-        default: new Date(),
-    }
-});
+}, { timestamps: true });
 const User = mongoose_1.default.model("User", UserSchema);
 exports.default = User;

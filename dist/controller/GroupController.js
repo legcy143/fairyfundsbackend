@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PromoteOrDemoteAsAdmin = exports.GroupInviteResponse = exports.SendRequest = exports.DeleteInviteLink = exports.InviteLinkGenerator = exports.AddItemsInGroup = exports.FetchGroupByID = exports.FetchMyGroup = exports.LeaveGroup = exports.DeleteGroup = exports.CreateNewGroup = void 0;
+exports.ManageUserCredit = exports.PromoteOrDemoteAsAdmin = exports.GroupInviteResponse = exports.SendRequest = exports.DeleteInviteLink = exports.InviteLinkGenerator = exports.AddItemsInGroup = exports.FetchGroupByID = exports.FetchMyGroup = exports.LeaveGroup = exports.DeleteGroup = exports.CreateNewGroup = void 0;
 const Group_1 = __importDefault(require("../Schema/Group"));
 const UserRoleEnum_1 = __importDefault(require("../enums/UserRoleEnum"));
 const User_1 = __importDefault(require("../Schema/User"));
@@ -94,8 +94,9 @@ exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
     let totalPrice = 0;
     // update total price
     item?.map((e) => {
-        totalPrice += e?.price;
+        totalPrice += parseInt(e?.price);
     });
+    // console.log(totalPrice , typeof totalPrice)
     let group = await Group_1.default.findById({ _id: groupID });
     let val = parseFloat((totalPrice / group?.users.length).toFixed(3));
     group = await Group_1.default.findOneAndUpdate({
@@ -114,7 +115,6 @@ exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
         // funds: totalFund - totalPrice,
         $push: {
             items: {
-                // $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                 $each: [{ addedBy: userID ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                 $position: 0,
             },
@@ -251,9 +251,20 @@ exports.GroupInviteResponse = (0, asyncHandler_1.default)(async (req, res) => {
 // on user actions
 exports.PromoteOrDemoteAsAdmin = (0, asyncHandler_1.default)(async (req, res) => {
     const { groupID, userID, memberID, isPromote } = req.body;
+    // console.log(memberID , userID , memberID == userID)
+    // member is is not member id it is member object
+    if (memberID._id == userID) {
+        return (0, Response_1.errorResponse)(res, 400, "some thing went wrong");
+    }
     const action = {
         $set: {
             'users.$.role': isPromote ? UserRoleEnum_1.default.Admin : UserRoleEnum_1.default.Member
+        },
+        $push: {
+            history: {
+                title: "Group update",
+                message: `${memberID.userName} ${isPromote ? " Promote as Group admin " : " Demote as group admin"} `,
+            }
         }
     };
     let group;
@@ -262,9 +273,51 @@ exports.PromoteOrDemoteAsAdmin = (0, asyncHandler_1.default)(async (req, res) =>
         "users.memberID": memberID,
         'groupOwner': userID,
     }, action, { new: true }).populate(GroupPopulater_1.GroupPopulater);
-    if (!group) {
-        return (0, Response_1.errorResponse)(res, 404, "something went wrong");
+    if (group) {
+        let data = JSON.stringify({ groupID });
+        let message = isPromote ? "you are promoted as group admin " : "you are demote as admin";
+        let user = await User_1.default.findOneAndUpdate({ _id: memberID._id }, {
+            $push: {
+                notifications: {
+                    title: "Group update",
+                    message: `${message} from group  ${group.groupName} , visit group for more detail`,
+                    data,
+                }
+            }
+        }, { new: true });
+        let resMessage = isPromote ? "Promote as a admin Successfully" : "Demote as a admin successfully";
+        return (0, Response_1.successResponse)(res, 200, resMessage, group);
     }
-    let message = isPromote ? "Promote as a admin Successfully" : "Demote as a admin successfully";
-    return (0, Response_1.successResponse)(res, 200, message, group);
+    return (0, Response_1.errorResponse)(res, 404, "something went wrong");
+});
+//manage funds
+exports.ManageUserCredit = (0, asyncHandler_1.default)(async (req, res) => {
+    const { amount, userID, memberID, groupID } = req.body;
+    let val = parseFloat((amount).toFixed(3));
+    let group = await Group_1.default.findOneAndUpdate({
+        _id: groupID,
+        "users.memberID": memberID,
+        'groupOwner': userID,
+    }, {
+        $inc: {
+            funds: +amount,
+            'users.$.credit': +val
+        }
+    }, { new: true }).populate(GroupPopulater_1.GroupPopulater);
+    if (group) {
+        let data = JSON.stringify({ groupID });
+        let user = await User_1.default.findOneAndUpdate({ _id: memberID._id }, {
+            $push: {
+                notifications: {
+                    title: "Fund update",
+                    message: `your fund was update in group ${group.groupName} , see your current amount`,
+                    data,
+                }
+            }
+        }, { new: true });
+        // console.log("notification to user ",user)
+        return (0, Response_1.successResponse)(res, 200, undefined, group);
+    }
+    // console.log(group)
+    return (0, Response_1.errorResponse)(res, 404, "Funds only manage by group owner");
 });

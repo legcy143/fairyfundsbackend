@@ -107,9 +107,10 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
 
     // update total price
     item?.map((e: any) => {
-        totalPrice += e?.price
+        totalPrice += parseInt(e?.price)
     })
-    let group:any = await Group.findById({ _id: groupID });
+    // console.log(totalPrice , typeof totalPrice)
+    let group: any = await Group.findById({ _id: groupID });
     let val = parseFloat((totalPrice / group?.users.length).toFixed(3));
     group = await Group.findOneAndUpdate(
         {
@@ -131,10 +132,8 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
             // funds: totalFund - totalPrice,
             $push: {
                 items: {
-                    // $each: [{ addedBy: addedByUser?.userName ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                     $each: [{ addedBy: userID ?? "NA", broughtBy, message, title, includedMembers, item, totalPrice, date }],
                     $position: 0,
-
                 },
             }
         },
@@ -146,8 +145,6 @@ export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) 
         group
     })
 })
-
-
 
 
 // add user in group functionality
@@ -303,13 +300,23 @@ export const GroupInviteResponse = asyncHandler(async (req: Request, res: Respon
 // on user actions
 export const PromoteOrDemoteAsAdmin = asyncHandler(async (req: Request, res: Response) => {
     const { groupID, userID, memberID, isPromote } = req.body
-
+    // console.log(memberID , userID , memberID == userID)
+    // member is is not member id it is member object
+    if (memberID._id == userID) {
+        return errorResponse(res, 400, "some thing went wrong")
+    }
     const action = {
         $set: {
             'users.$.role': isPromote ? UserRoleEnum.Admin : UserRoleEnum.Member
+        },
+        $push: {
+            history: {
+                title: "Group update",
+                message: `${memberID.userName} ${isPromote ? " Promote as Group admin " : " Demote as group admin"} `,
+            }
         }
-
     }
+
 
     let group;
     group = await Group.findOneAndUpdate({
@@ -320,9 +327,65 @@ export const PromoteOrDemoteAsAdmin = asyncHandler(async (req: Request, res: Res
         action,
         { new: true }).populate(GroupPopulater)
 
-    if (!group) {
-        return errorResponse(res, 404, "something went wrong")
+    if (group) {
+
+        let data = JSON.stringify({ groupID });
+        let message = isPromote ? "you are promoted as group admin " : "you are demote as admin"
+        let user = await User.findOneAndUpdate(
+            { _id: memberID._id },
+            {
+                $push: {
+                    notifications: {
+                        title: "Group update",
+                        message: `${message} from group  ${group.groupName} , visit group for more detail`,
+                        data,
+                    }
+                }
+            },
+            { new: true }
+        )
+        let resMessage = isPromote ? "Promote as a admin Successfully" : "Demote as a admin successfully"
+        return successResponse(res, 200, resMessage, group)
     }
-    let message = isPromote ? "Promote as a admin Successfully" : "Demote as a admin successfully"
-    return successResponse(res, 200, message, group)
+    return errorResponse(res, 404, "something went wrong")
+})
+
+//manage funds
+export const ManageUserCredit = asyncHandler(async (req: Request, res: Response) => {
+    const { amount, userID, memberID, groupID } = req.body;
+    let val = parseFloat((amount).toFixed(3));
+    let group: any = await Group.findOneAndUpdate(
+        {
+            _id: groupID,
+            "users.memberID": memberID,
+            'groupOwner': userID,
+        },
+        {
+            $inc: {
+                funds: +amount,
+                'users.$.credit': +val
+            }
+        },
+        { new: true }
+    ).populate(GroupPopulater);
+    if (group) {
+        let data = JSON.stringify({ groupID })
+        let user = await User.findOneAndUpdate(
+            { _id: memberID._id },
+            {
+                $push: {
+                    notifications: {
+                        title: "Fund update",
+                        message: `your fund was update in group ${group.groupName} , see your current amount`,
+                        data,
+                    }
+                }
+            },
+            { new: true }
+        )
+        // console.log("notification to user ",user)
+        return successResponse(res, 200, undefined, group)
+    }
+    // console.log(group)
+    return errorResponse(res, 404, "Funds only manage by group owner")
 })

@@ -145,6 +145,53 @@ const GroupSchema = new mongoose_1.Schema({
             }
         }
     ],
+    task: [
+        {
+            title: {
+                type: String,
+            },
+            description: {
+                type: String,
+            },
+            isDone: {
+                type: Boolean,
+                default: false,
+            },
+            createdBy: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+            mentioned: [
+                {
+                    user: {
+                        type: mongoose_1.Schema.Types.ObjectId,
+                        ref: 'User'
+                    }
+                }
+            ],
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            }
+        }
+    ],
+    history: [
+        {
+            message: {
+                type: String,
+            },
+            title: {
+                type: String,
+            },
+            data: {
+                type: String,
+            },
+            createdAt: {
+                type: Date,
+                default: new Date(),
+            }
+        }
+    ],
     inviteKeys: [
         {
             key: {
@@ -163,16 +210,5 @@ const GroupSchema = new mongoose_1.Schema({
         }
     ],
 }, { timestamps: true });
-// GroupSchema.pre<any>('findOneAndUpdate', async function (next: any) {
-//     try {
-//         console.log("hii there from group schema pre  function")
-//         console.log(this.schema.obj.users)
-//         const totalCredits: any = this.schema.obj.users.reduce((total: any, user: any) => total + user.credit, 0);
-//         this.funds = totalCredits;
-//         next();
-//     } catch (error) {
-//         next(error);
-//     }
-// });
 const Group = mongoose_1.default.model("Group", GroupSchema);
 exports.default = Group;

@@ -5,13 +5,15 @@
 [/] = promote as admin by main admin only
 [/] = admin basic dashboard
 
-//currently working on 
-[X] = verify email and phone number
+//currently working on
+[x] = send feedback
+[x] = message notification 
 [X] = task CRUD;
 
 
 // left features
 
+[X] = verify email and phone number
 [X] = update product
 [X] = delte product
 [X] = password reset
