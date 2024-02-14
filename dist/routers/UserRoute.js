@@ -12,4 +12,6 @@ UserRoute.post("/login", UserController_1.UserLogin);
 UserRoute.post("/signup", UserController_1.UserSignup);
 UserRoute.post("/fetchuser", VerifyToken_1.verifyToken, UserController_1.FetchProfile);
 UserRoute.post("/editprofile", VerifyToken_1.verifyToken, UserController_1.EditProfile);
+UserRoute.post("/notification/seenall", VerifyToken_1.verifyToken, UserController_1.MarkAllSeenNotification);
+UserRoute.post("/notification/removeall", VerifyToken_1.verifyToken, UserController_1.RemoveAllNotification);
 exports.default = UserRoute;

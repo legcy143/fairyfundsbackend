@@ -92,6 +92,10 @@ const UserSchema = new mongoose_1.Schema({
             title: {
                 type: String,
             },
+            isSeen: {
+                type: Boolean,
+                default: false,
+            },
             data: {
                 type: String,
             },

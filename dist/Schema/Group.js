@@ -145,12 +145,9 @@ const GroupSchema = new mongoose_1.Schema({
             }
         }
     ],
-    task: [
+    todos: [
         {
-            title: {
-                type: String,
-            },
-            description: {
+            todo: {
                 type: String,
             },
             isDone: {
@@ -175,7 +172,7 @@ const GroupSchema = new mongoose_1.Schema({
             }
         }
     ],
-    history: [
+    activity: [
         {
             message: {
                 type: String,

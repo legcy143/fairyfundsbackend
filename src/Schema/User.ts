@@ -66,6 +66,10 @@ const UserSchema: Schema<UserTypes> = new Schema<UserTypes>({
             title:{
                 type:String,
             },
+            isSeen:{
+                type:Boolean,
+                default:false,
+            },
             data:{
                 type:String,
             },

@@ -19,6 +19,7 @@ export interface UserTypes extends Document {
         message: string, 
         title: string,
         data:string,
+        isSeen:boolean,
         createdAt?: Date,
     }[]
     lastVisit: Date;

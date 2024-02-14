@@ -1,6 +1,6 @@
 import Router from 'express';
 import { verifyToken } from '../middlewares/VerifyToken';
-import {  AddItemsInGroup, CreateNewGroup, DeleteGroup, DeleteInviteLink, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, ManageUserCredit, PromoteOrDemoteAsAdmin, SendRequest } from '../controller/GroupController';
+import {  AddItemsInGroup, AddTodo, CreateNewGroup, DeleteGroup, DeleteInviteLink, DeleteTodo, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, ManageUserCredit, MarkAsDoneTodo, PromoteOrDemoteAsAdmin, SendRequest } from '../controller/GroupController';
 
 const GroupRoute = Router();
 
@@ -28,6 +28,11 @@ GroupRoute.post("/manageusercredit" , verifyToken , ManageUserCredit)
 
 //product action route
 GroupRoute.post("/additem", verifyToken, AddItemsInGroup)
+
+// group todo actions
+GroupRoute.post("/todo/add", verifyToken, AddTodo)
+GroupRoute.post("/todo/done", verifyToken, MarkAsDoneTodo)
+GroupRoute.post("/todo/delete", verifyToken, DeleteTodo)
 
 
 

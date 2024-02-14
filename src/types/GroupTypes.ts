@@ -41,8 +41,8 @@ export interface GroupTypes extends Document {
     request: any[]
     items: ItemsType[];
     users: UserType[];
-    task: { title: string, description: string, createdBy: ObjectId, isDone: boolean,mentioned:{user:ObjectId}[], createdAt?: Date }[]
-    history: { title: string, message: string, data?: string, createdAt?: Date }[]
+    todos: { todo: string, createdBy: ObjectId, isDone: boolean,mentioned:{user:ObjectId}[], createdAt?: Date }[]
+    activity: { title: string, message: string, data?: string, createdAt?: Date }[]
     inviteKeys: { key: string, IV: string, genrateBy: string, createdAt: Date }[]
     // createdAt:Date,
     // updatedAt: Date;

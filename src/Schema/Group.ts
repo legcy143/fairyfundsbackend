@@ -119,12 +119,9 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
             }
         }
     ],
-    task: [
+    todos: [
         {
-            title: {
-                type: String,
-            },
-            description: {
+            todo: {
                 type: String,
             },
             isDone: {
@@ -149,7 +146,7 @@ const GroupSchema: Schema<GroupTypes> = new Schema<GroupTypes>({
             }
         }
     ],
-    history: [
+    activity: [
         {
             message: {
                 type: String,

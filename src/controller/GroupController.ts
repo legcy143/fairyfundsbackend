@@ -307,17 +307,19 @@ export const PromoteOrDemoteAsAdmin = asyncHandler(async (req: Request, res: Res
     }
     const action = {
         $set: {
-            'users.$.role': isPromote ? UserRoleEnum.Admin : UserRoleEnum.Member
+            'users.$.role': isPromote ? UserRoleEnum.Admin : UserRoleEnum.Member,
         },
         $push: {
-            history: {
-                title: "Group update",
-                message: `${memberID.userName} ${isPromote ? " Promote as Group admin " : " Demote as group admin"} `,
-            }
-        }
+            activity: {
+                $each: [{
+                    title: "Group update v2.2",
+                    message: `${memberID.userName} ${isPromote ? " Promote as Group admin " : " Demote as group admin"} `
+                }],
+                $position: 0,
+                $slice: 20,
+            },
+        },
     }
-
-
     let group;
     group = await Group.findOneAndUpdate({
         _id: groupID,
@@ -336,9 +338,12 @@ export const PromoteOrDemoteAsAdmin = asyncHandler(async (req: Request, res: Res
             {
                 $push: {
                     notifications: {
-                        title: "Group update",
-                        message: `${message} from group  ${group.groupName} , visit group for more detail`,
-                        data,
+                        $each: [{
+                            title: "Group update",
+                            message: `${message} from group ${group.groupName}, visit group for more detail`,
+                            data,
+                        }],
+                        $position: 0,
                     }
                 }
             },
@@ -364,7 +369,17 @@ export const ManageUserCredit = asyncHandler(async (req: Request, res: Response)
             $inc: {
                 funds: +amount,
                 'users.$.credit': +val
-            }
+            },
+            $push: {
+                activity: {
+                    $each: [{
+                        title: "Fund update",
+                        message: ` ${memberID.userName} fund was update by ${val}`,
+                    }],
+                    $position: 0,
+                    $slice: 20,
+                },
+            },
         },
         { new: true }
     ).populate(GroupPopulater);
@@ -375,9 +390,12 @@ export const ManageUserCredit = asyncHandler(async (req: Request, res: Response)
             {
                 $push: {
                     notifications: {
-                        title: "Fund update",
-                        message: `your fund was update in group ${group.groupName} , see your current amount`,
-                        data,
+                        $each: [{
+                            title: "Fund update",
+                            message: `your fund was update in group ${group.groupName} by  ${val}, see your current amount`,
+                            data,
+                        }],
+                        $position: 0,
                     }
                 }
             },
@@ -388,4 +406,89 @@ export const ManageUserCredit = asyncHandler(async (req: Request, res: Response)
     }
     // console.log(group)
     return errorResponse(res, 404, "Funds only manage by group owner")
+})
+
+export const AddTodo = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, groupID, todo } = req.body
+    let group = await Group.findOneAndUpdate(
+        {
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+        },
+        {
+            $push: {
+                todos: {
+                    $each: [{
+                        todo,
+                        createdBy: userID,
+                    }],
+                    $position: 0,
+                    $slice: 20,
+                }
+            }
+        },
+        { new: true },
+    ).populate(GroupPopulater)
+
+    if (group) {
+        return successResponse(res, 200, "Added todo Sucessfully", group)
+    }
+    return errorResponse(res, 404, "Group not found")
+})
+export const MarkAsDoneTodo = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, groupID, todoID } = req.body
+    let group = await Group.findOneAndUpdate(
+        {
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+            'todos._id': todoID,
+        },
+        {
+            $set: {
+                'todos.$.isDone': true
+            }
+        },
+        { new: true },
+    ).populate(GroupPopulater)
+
+    if (group) {
+        return successResponse(res, 200, "Added todo Sucessfully", group)
+    }
+    return errorResponse(res, 404, "Group not found")
+})
+export const DeleteTodo = asyncHandler(async (req: Request, res: Response) => {
+    const { userID, groupID, todoID } = req.body
+    let group = await Group.findOneAndUpdate(
+        {
+            _id: groupID,
+            users: {
+                $elemMatch: {
+                    memberID: userID,
+                    role: UserRoleEnum.Admin
+                }
+            },
+            'todos._id': todoID,
+        },
+        {
+            $pull: {
+                'todos': {_id:todoID}
+            }
+        },
+        { new: true },
+    ).populate(GroupPopulater)
+
+    if (group) {
+        return successResponse(res, 200, "delete Todo successfully", group)
+    }
+    return errorResponse(res, 404, "Group not found")
 })

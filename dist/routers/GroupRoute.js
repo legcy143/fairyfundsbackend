@@ -25,4 +25,8 @@ GroupRoute.get("/fetchgroup/:groupID", VerifyToken_1.verifyToken, GroupControlle
 GroupRoute.post("/manageusercredit", VerifyToken_1.verifyToken, GroupController_1.ManageUserCredit);
 //product action route
 GroupRoute.post("/additem", VerifyToken_1.verifyToken, GroupController_1.AddItemsInGroup);
+// group todo actions
+GroupRoute.post("/todo/add", VerifyToken_1.verifyToken, GroupController_1.AddTodo);
+GroupRoute.post("/todo/done", VerifyToken_1.verifyToken, GroupController_1.MarkAsDoneTodo);
+GroupRoute.post("/todo/delete", VerifyToken_1.verifyToken, GroupController_1.DeleteTodo);
 exports.default = GroupRoute;

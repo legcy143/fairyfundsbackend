@@ -14,5 +14,9 @@ export const GroupPopulater = [
     {
         path: 'items.broughtBy',
         select: ['userName', 'bio']
+    },
+    {
+        path: 'todos.createdBy',
+        select: ['userName', 'bio']
     }
 ]
