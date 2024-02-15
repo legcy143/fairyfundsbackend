@@ -75,12 +75,27 @@ export const LeaveGroup: any = asyncHandler(async (req: Request, res: Response) 
 
 export const FetchMyGroup = asyncHandler(async (req: Request, res: Response) => {
     const { userID } = req.body;
-    let groups = await Group.find({ "users.memberID": userID }).populate(GroupPopulater);
-    groups.reverse();
-    return res.status(200).send({
-        success: true,
-        groups,
+    let groupData = await Group.find({ "users.memberID": userID }).populate(GroupPopulater).lean();
+
+    let groups = groupData.map((e: any) => {
+        let isAdmin = false;
+        let isOwner = false;
+        let myCredit = 0;
+        e?.users.map((user: any) => {
+            if (user?.memberID?._id == userID) {
+                isAdmin = user?.role == UserRoleEnum.Admin
+                isOwner = userID == e?.groupOwner
+                myCredit = user?.credit
+                return 0;
+            }
+            // console.log("hehe" ,e._id , user.memberID._id == userID)
+        })
+        return { isAdmin, isOwner, myCredit, ...e };
     })
+    groups.reverse();
+    if (groupData) {
+        return successResponse(res, 200, undefined, groups)
+    }
 })
 
 // need to finish
@@ -91,10 +106,24 @@ export const FetchGroupByID = asyncHandler(async (req: Request, res: Response) =
         "users.memberID": userID,
         "_id": groupID
     }).populate(GroupPopulater)
-    if (!group)
-        return errorResponse(res, 404, 'Group Not Found')
-    else
-        return successResponse(res, 200, 'group found', group)
+    if (group) {
+        let isAdmin = false;
+        let isOwner = false;
+        let myCredit = 0;
+        group?.users.map((user: any) => {
+            if (user?.memberID?._id == userID) {
+                isAdmin = user?.role == UserRoleEnum.Admin
+                isOwner = userID == group?.groupOwner
+                myCredit = user?.credit
+                return 0;
+            }
+        })
+        group = group.toObject();
+        return successResponse(res, 200, 'group found', {
+            ...group, isAdmin, isOwner, myCredit
+        })
+    }
+    return errorResponse(res, 404, 'Group Not Found')
 })
 
 export const AddItemsInGroup = asyncHandler(async (req: Request, res: Response) => {
@@ -481,7 +510,7 @@ export const DeleteTodo = asyncHandler(async (req: Request, res: Response) => {
         },
         {
             $pull: {
-                'todos': {_id:todoID}
+                'todos': { _id: todoID }
             }
         },
         { new: true },

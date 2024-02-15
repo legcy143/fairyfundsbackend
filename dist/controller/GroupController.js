@@ -65,12 +65,26 @@ exports.LeaveGroup = (0, asyncHandler_1.default)(async (req, res) => {
 });
 exports.FetchMyGroup = (0, asyncHandler_1.default)(async (req, res) => {
     const { userID } = req.body;
-    let groups = await Group_1.default.find({ "users.memberID": userID }).populate(GroupPopulater_1.GroupPopulater);
-    groups.reverse();
-    return res.status(200).send({
-        success: true,
-        groups,
+    let groupData = await Group_1.default.find({ "users.memberID": userID }).populate(GroupPopulater_1.GroupPopulater).lean();
+    let groups = groupData.map((e) => {
+        let isAdmin = false;
+        let isOwner = false;
+        let myCredit = 0;
+        e?.users.map((user) => {
+            if (user?.memberID?._id == userID) {
+                isAdmin = user?.role == UserRoleEnum_1.default.Admin;
+                isOwner = userID == e?.groupOwner;
+                myCredit = user?.credit;
+                return 0;
+            }
+            // console.log("hehe" ,e._id , user.memberID._id == userID)
+        });
+        return { isAdmin, isOwner, myCredit, ...e };
     });
+    groups.reverse();
+    if (groupData) {
+        return (0, Response_1.successResponse)(res, 200, undefined, groups);
+    }
 });
 // need to finish
 exports.FetchGroupByID = (0, asyncHandler_1.default)(async (req, res) => {
@@ -80,10 +94,24 @@ exports.FetchGroupByID = (0, asyncHandler_1.default)(async (req, res) => {
         "users.memberID": userID,
         "_id": groupID
     }).populate(GroupPopulater_1.GroupPopulater);
-    if (!group)
-        return (0, Response_1.errorResponse)(res, 404, 'Group Not Found');
-    else
-        return (0, Response_1.successResponse)(res, 200, 'group found', group);
+    if (group) {
+        let isAdmin = false;
+        let isOwner = false;
+        let myCredit = 0;
+        group?.users.map((user) => {
+            if (user?.memberID?._id == userID) {
+                isAdmin = user?.role == UserRoleEnum_1.default.Admin;
+                isOwner = userID == group?.groupOwner;
+                myCredit = user?.credit;
+                return 0;
+            }
+        });
+        group = group.toObject();
+        return (0, Response_1.successResponse)(res, 200, 'group found', {
+            ...group, isAdmin, isOwner, myCredit
+        });
+    }
+    return (0, Response_1.errorResponse)(res, 404, 'Group Not Found');
 });
 exports.AddItemsInGroup = (0, asyncHandler_1.default)(async (req, res) => {
     const { groupID, userID, broughtBy, message, title, includedMembers, item, date } = req.body;
