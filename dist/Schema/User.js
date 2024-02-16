@@ -110,6 +110,15 @@ const UserSchema = new mongoose_1.Schema({
         type: Date,
         default: new Date(),
     },
+    rating: {
+        star: {
+            type: Number,
+            default: 1,
+            min: 1,
+            max: 5,
+        },
+        message: String,
+    }
 }, { timestamps: true });
 const User = mongoose_1.default.model("User", UserSchema);
 exports.default = User;

@@ -11,7 +11,15 @@ const UserRoute = (0, express_1.default)();
 UserRoute.post("/login", UserController_1.UserLogin);
 UserRoute.post("/signup", UserController_1.UserSignup);
 UserRoute.post("/fetchuser", VerifyToken_1.verifyToken, UserController_1.FetchProfile);
-UserRoute.post("/editprofile", VerifyToken_1.verifyToken, UserController_1.EditProfile);
+// handle notification
 UserRoute.post("/notification/seenall", VerifyToken_1.verifyToken, UserController_1.MarkAllSeenNotification);
 UserRoute.post("/notification/removeall", VerifyToken_1.verifyToken, UserController_1.RemoveAllNotification);
+// get otp to email
+UserRoute.post("/otp/getotp", VerifyToken_1.verifyToken, UserController_1.SendOtpToEmail);
+// update profile
+UserRoute.post("/otp/updateemail", VerifyToken_1.verifyToken, UserController_1.UpdateEmail);
+UserRoute.post("/editprofile", VerifyToken_1.verifyToken, UserController_1.EditProfile);
+UserRoute.post("/changepassword", VerifyToken_1.verifyToken, UserController_1.ChangePassword);
+// extras like rating and fedbacks
+UserRoute.post("/rateus", VerifyToken_1.verifyToken, UserController_1.RateUs);
 exports.default = UserRoute;

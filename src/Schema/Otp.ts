@@ -1,5 +1,6 @@
 import mongoose, { Mongoose, Schema } from "mongoose";
 import { OtpTypes } from "../types/OtpTypes";
+import OtptypeEnum from "../enums/OtpTypeEnum";
 
 export const OtpSchema: Schema<OtpTypes> = new Schema<OtpTypes>({
     email: {
@@ -7,27 +8,24 @@ export const OtpSchema: Schema<OtpTypes> = new Schema<OtpTypes>({
         required: true
     },
     otp: {
-        type: String
+        type: Number,
+        default:0
     },
     VerificationCode: {
         type: Number
     },
     otpFor: {
         type: String,
-        default:"authentication"
+        default:OtptypeEnum.default
     },
     isValid: {
         type: Boolean,
         default:true
     },
-    location:{
+    otpGeneratorDetail:{
         type:String,
         default:""
     },
-    firstVisitAt : {
-        type: Date,
-        default: new Date(),
-    }
-});
+},{timestamps:true});
 const Otp = mongoose.model<OtpTypes>("Otp", OtpSchema);
 export default Otp;

@@ -21,7 +21,11 @@ export interface UserTypes extends Document {
         data:string,
         isSeen:boolean,
         createdAt?: Date,
-    }[]
+    }[];
+    rating:{
+        star:number,
+        message:string,
+    }
     lastVisit: Date;
     updatedAt?: Date,
     createdAt?: Date,

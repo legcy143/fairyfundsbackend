@@ -2,10 +2,9 @@ import { Document } from "mongoose";
 
 export interface OtpTypes extends Document {
     email:string,
-    otp :string,
+    otp :number,
     VerificationCode :number,
-    location:String,
+    otpGeneratorDetail:String,
     otpFor :string
     isValid:boolean
-    firstVisitAt:Date
 }

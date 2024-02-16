@@ -22,36 +22,37 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OtpSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const OtpTypeEnum_1 = __importDefault(require("../enums/OtpTypeEnum"));
 exports.OtpSchema = new mongoose_1.Schema({
     email: {
         type: String,
         required: true
     },
     otp: {
-        type: String
+        type: Number,
+        default: 0
     },
     VerificationCode: {
         type: Number
     },
     otpFor: {
         type: String,
-        default: "authentication"
+        default: OtpTypeEnum_1.default.default
     },
     isValid: {
         type: Boolean,
         default: true
     },
-    location: {
+    otpGeneratorDetail: {
         type: String,
         default: ""
     },
-    firstVisitAt: {
-        type: Date,
-        default: new Date(),
-    }
-});
+}, { timestamps: true });
 const Otp = mongoose_1.default.model("Otp", exports.OtpSchema);
 exports.default = Otp;

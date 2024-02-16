@@ -84,6 +84,16 @@ const UserSchema: Schema<UserTypes> = new Schema<UserTypes>({
         type: Date,
         default: new Date(),
     },
+    rating:{
+        star:{
+            type:Number,
+            default:1,
+            min:1,
+            max:5,
+        },
+        message:String,
+
+    }
 } ,{timestamps:true})
 
 const User = mongoose.model<UserTypes>("User", UserSchema);

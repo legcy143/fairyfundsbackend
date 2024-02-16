@@ -1,5 +1,7 @@
-enum Otptype{
+enum OtptypeEnum{
     Auth = 'auth',
-    ForgetPassword = 'forget password'
+    ForgetPassword = 'forget password',
+    UpdateEmail = 'update email',
+    default = 'default'
 }
-export default Otptype
+export default OtptypeEnum
