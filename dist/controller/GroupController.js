@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteTodo = exports.MarkAsDoneTodo = exports.AddTodo = exports.ManageUserCredit = exports.PromoteOrDemoteAsAdmin = exports.GroupInviteResponse = exports.SendRequest = exports.DeleteInviteLink = exports.InviteLinkGenerator = exports.AddItemsInGroup = exports.FetchGroupByID = exports.FetchMyGroup = exports.LeaveGroup = exports.DeleteGroup = exports.CreateNewGroup = void 0;
+exports.DeleteTodo = exports.MarkAsDoneTodo = exports.AddTodo = exports.ManageUserCredit = exports.PromoteOrDemoteAsAdmin = exports.RemoveMember = exports.GroupInviteResponse = exports.SendRequest = exports.DeleteInviteLink = exports.InviteLinkGenerator = exports.AddItemsInGroup = exports.FetchGroupByID = exports.FetchMyGroup = exports.LeaveGroup = exports.DeleteGroup = exports.CreateNewGroup = void 0;
 const Group_1 = __importDefault(require("../Schema/Group"));
 const UserRoleEnum_1 = __importDefault(require("../enums/UserRoleEnum"));
 const User_1 = __importDefault(require("../Schema/User"));
@@ -276,6 +276,28 @@ exports.GroupInviteResponse = (0, asyncHandler_1.default)(async (req, res) => {
     let message = isAccept ? "join request successfully" : "Request Rejected";
     return (0, Response_1.successResponse)(res, 200, message, group);
 });
+exports.RemoveMember = (0, asyncHandler_1.default)(async (req, res) => {
+    const { groupID, userID, memberID } = req.body;
+    const commonQuery = {
+        _id: groupID,
+        "users.memberID": memberID,
+        "groupOwner": userID,
+        users: {
+            $elemMatch: {
+                memberID: userID,
+                role: UserRoleEnum_1.default.Admin,
+            },
+        },
+    };
+    let group;
+    group = await Group_1.default.findOneAndUpdate(commonQuery, { $pull: {
+            users: { memberID }
+        } }, { new: true }).populate(GroupPopulater_1.GroupPopulater);
+    if (group) {
+        return (0, Response_1.successResponse)(res, 200, "remove from group succesfully", group);
+    }
+    return (0, Response_1.errorResponse)(res, 404, "Only Group Owner remove group member");
+});
 // on user actions
 exports.PromoteOrDemoteAsAdmin = (0, asyncHandler_1.default)(async (req, res) => {
     const { groupID, userID, memberID, isPromote } = req.body;
@@ -369,6 +391,7 @@ exports.ManageUserCredit = (0, asyncHandler_1.default)(async (req, res) => {
     // console.log(group)
     return (0, Response_1.errorResponse)(res, 404, "Funds only manage by group owner");
 });
+// todos
 exports.AddTodo = (0, asyncHandler_1.default)(async (req, res) => {
     const { userID, groupID, todo } = req.body;
     let group = await Group_1.default.findOneAndUpdate({

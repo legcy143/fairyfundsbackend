@@ -324,6 +324,33 @@ export const GroupInviteResponse = asyncHandler(async (req: Request, res: Respon
     return successResponse(res, 200, message, group)
 })
 
+export const RemoveMember = asyncHandler(async (req: Request, res: Response) => {
+    const { groupID, userID, memberID } = req.body
+    const commonQuery = {
+        _id: groupID,
+        "users.memberID": memberID,
+        "groupOwner":userID,
+        users: {
+            $elemMatch: {
+                memberID: userID,
+                role: UserRoleEnum.Admin,
+            },
+        },
+    };
+
+
+    let group;
+    group = await Group.findOneAndUpdate(commonQuery,
+         {$pull: {
+            users: { memberID }
+        }}
+        , { new: true }).populate(GroupPopulater)
+
+    if (group) {
+        return successResponse(res, 200, "remove from group succesfully", group)
+    }
+    return errorResponse(res, 404, "Only Group Owner remove group member")
+})
 
 
 // on user actions
@@ -437,6 +464,7 @@ export const ManageUserCredit = asyncHandler(async (req: Request, res: Response)
     return errorResponse(res, 404, "Funds only manage by group owner")
 })
 
+// todos
 export const AddTodo = asyncHandler(async (req: Request, res: Response) => {
     const { userID, groupID, todo } = req.body
     let group = await Group.findOneAndUpdate(

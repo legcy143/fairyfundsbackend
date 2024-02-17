@@ -1,6 +1,6 @@
 import Router from 'express';
 import { verifyToken } from '../middlewares/VerifyToken';
-import {  AddItemsInGroup, AddTodo, CreateNewGroup, DeleteGroup, DeleteInviteLink, DeleteTodo, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, ManageUserCredit, MarkAsDoneTodo, PromoteOrDemoteAsAdmin, SendRequest } from '../controller/GroupController';
+import {  AddItemsInGroup, AddTodo, CreateNewGroup, DeleteGroup, DeleteInviteLink, DeleteTodo, FetchGroupByID, FetchMyGroup, GroupInviteResponse, InviteLinkGenerator, LeaveGroup, ManageUserCredit, MarkAsDoneTodo, PromoteOrDemoteAsAdmin, RemoveMember, SendRequest } from '../controller/GroupController';
 
 const GroupRoute = Router();
 
@@ -17,6 +17,7 @@ GroupRoute.post("/groupinviteresponse", verifyToken, GroupInviteResponse);
 GroupRoute.post("/genrateinvitelink" , verifyToken ,InviteLinkGenerator)
 GroupRoute.post("/removeinvitelink" , verifyToken ,DeleteInviteLink)
 GroupRoute.post("/sendrequest" , verifyToken ,SendRequest)
+GroupRoute.post("/removemember" , verifyToken , RemoveMember)
 
 // fetch user group
 GroupRoute.get("/fetchmygroup", verifyToken, FetchMyGroup)

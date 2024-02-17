@@ -18,6 +18,7 @@ GroupRoute.post("/groupinviteresponse", VerifyToken_1.verifyToken, GroupControll
 GroupRoute.post("/genrateinvitelink", VerifyToken_1.verifyToken, GroupController_1.InviteLinkGenerator);
 GroupRoute.post("/removeinvitelink", VerifyToken_1.verifyToken, GroupController_1.DeleteInviteLink);
 GroupRoute.post("/sendrequest", VerifyToken_1.verifyToken, GroupController_1.SendRequest);
+GroupRoute.post("/removemember", VerifyToken_1.verifyToken, GroupController_1.RemoveMember);
 // fetch user group
 GroupRoute.get("/fetchmygroup", VerifyToken_1.verifyToken, GroupController_1.FetchMyGroup);
 GroupRoute.get("/fetchgroup/:groupID", VerifyToken_1.verifyToken, GroupController_1.FetchGroupByID);
