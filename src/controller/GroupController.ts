@@ -102,7 +102,7 @@ export const FetchMyGroup = asyncHandler(async (req: Request, res: Response) => 
 export const FetchGroupByID = asyncHandler(async (req: Request, res: Response) => {
     const { userID } = req.body;
     const { groupID } = req.params
-    let group = await Group.findOne({
+    let group:any = await Group.findOne({
         "users.memberID": userID,
         "_id": groupID
     }).populate(GroupPopulater)
