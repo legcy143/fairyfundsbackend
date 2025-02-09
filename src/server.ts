@@ -17,6 +17,6 @@ let timer = setInterval(async() => {
         let res = await axios.get(process.env.PROD_URL+"/health")
         console.log("console for prevent auto stop service in server.ts line no.7" , res.data)
     } catch (error) {
-        console.log("error in server.ts line no.7" , error)        
+        console.log("error in server.ts line no.7")        
     }
 }, 3000);
