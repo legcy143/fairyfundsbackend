@@ -23,6 +23,7 @@ export const AdminGetOtp = asyncHandler(async(req:Request , res:Response)=>{
 
 export const Admin2FVerify = asyncHandler(async(req:Request , res:Response)=>{
     const {email , password ,otp } = req.body;
+    console.log(" dummy otp " , dummy.otp)
     if(email == dummy.email && password == dummy.password && otp == dummy.otp){
         let jwt = GenrateJwtToken(dummy ,'1h');
         let profile = {
