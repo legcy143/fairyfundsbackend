@@ -10,7 +10,7 @@ export const AdminCheck = (req: Request, res: Response, next: NextFunction) => {
   }
   jwt.verify(token, secret, (err: any, decoded: any) => {
     console.log(decoded._id)
-      if(decoded._id !== 566556655665){
+      if(decoded._id !== process.env.ADMIN_ID){
         throw "invalid user id"
       }
     if (err) {
