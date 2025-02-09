@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export const AdminCheck = (req: Request, res: Response, next: NextFunction) => {
-  let secret = process.env.JWT_SECRET || "lb321";
+  let secret = process.env.JWT_SECRET as string;
   const token = req.headers.authorization;
   // console.log(req.body)
   if (!token) {
