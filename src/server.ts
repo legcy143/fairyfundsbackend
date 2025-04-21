@@ -12,11 +12,19 @@ server.listen(port, () => {
 
 
 
-let timer = setInterval(async() => {
+let wait = 5000;
+async function HealthCheck() {
+  let isRun = true;
+  while (isRun) {
     try {
-        let res = await axios.get(process.env.PROD_URL+"/health")
-        console.log("console for prevent auto stop service in server.ts line no.7" , res.data)
+      await new Promise((resolve) => setTimeout(resolve, wait));
+      wait = Math.floor(Math.random() * 30000) + 2000;
+      let res = await axios.get(process.env.PROD_URL+"/health")
+      console.log("Health : ", res?.data?.status);
     } catch (error) {
-        console.log("error in server.ts line no.7" , process.env.PROD_URL+"/health" )        
+      isRun = false;
+      console.error("Health Check Error: ", error);
     }
-}, 3000);
+  }
+}
+HealthCheck();
